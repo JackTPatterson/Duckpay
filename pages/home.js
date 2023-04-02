@@ -14,8 +14,7 @@ import {
 
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import {TailwindProvider} from "tailwindcss-react-native";
+
 
 import {useEffect, useState, useRef, useCallback, useMemo} from "react";
 
@@ -36,38 +35,7 @@ import {Keypad} from "./keypad";
 import {BarCodeScanner} from "expo-barcode-scanner";
 import BottomSheet from "react-native-simple-bottom-sheet";
 
-
-function Scanner() {
-
-    const [hasPermission, setHasPermission] = useState(null);
-    const [scanned, setScanned] = useState(false);
-
-    useEffect(() => {
-        (async () => {
-            const { status } = await BarCodeScanner.requestPermissionsAsync();
-            setHasPermission(status === 'granted');
-        })();
-    }, []);
-
-    const handleBarCodeScanned = ({ type, data }) => {
-    };
-
-    if (hasPermission === null) {
-        return <Text>Requesting for camera permission</Text>;
-    }
-    if (hasPermission === false) {
-        return <Text>No access to camera</Text>;
-    }
-    return (
-        <View style={styles.container}>
-            <BarCodeScanner
-                onBarCodeScanned={scanned ? undefined : <Keypad/>}
-                style={StyleSheet.absoluteFillObject}
-            />
-            {scanned && <Button title={'Tap to Scan Again'} onPress={() => setScanned(false)} />}
-        </View>
-    )
-}
+import {Scanner} from './Scanner';
 
 export function Home() {
     let fontLoaded = useFonts({
@@ -79,7 +47,7 @@ export function Home() {
 
     const [balance, setBalance] = useState("$---.--");
 
-    const [balanceType, changeBalanceType] = useState(null);
+    const [balanceType, changeBalanceType] = useState(0);
 
     function handleQR() {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -103,7 +71,7 @@ export function Home() {
         setBalance("$300.50")
     }, [])
 
-    function HomeComp() {
+    const HomeComp = ({navigation}) => {
         return (
             <View>
                 <SafeAreaView style={styles.body}>
@@ -228,7 +196,24 @@ export function Home() {
                                 }}>
 
                                     <TouchableOpacity style={{flexDirection: 'column', justifyContent: 'center',}}>
-                                        <Svg width="45" height="45" viewBox="0 0 25 24" fill="none"
+
+
+                                        <Svg width={45} height={45} viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <Path d="M9.875 13.75C9.875 14.72 10.625 15.5 11.545 15.5H13.425C14.225 15.5 14.875 14.82 14.875 13.97C14.875 13.06 14.475 12.73 13.885 12.52L10.875 11.47C10.285 11.26 9.88501 10.94 9.88501 10.02C9.88501 9.17999 10.535 8.48999 11.335 8.48999H13.215C14.135 8.48999 14.885 9.26999 14.885 10.24" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                            <Path d="M12.375 7.5V16.5" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                            <Path d="M22.375 12C22.375 17.52 17.895 22 12.375 22C6.855 22 2.375 17.52 2.375 12C2.375 6.48 6.855 2 12.375 2" stroke="#1D3A70" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                            <Path d="M22.375 6V2H18.375" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                            <Path d="M17.375 7L22.375 2" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </Svg>
+
+                                        <Text style={{fontFamily: 'Sora-SemiBold', marginTop: 10, textAlign: 'center'}}>
+                                            Send
+                                        </Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity>
+
+
+                                        <Svg width="45" height="45" style={{marginLeft: 5}} viewBox="0 0 25 24" fill="none"
                                              xmlns="http://www.w3.org/2000/svg">
                                             <Path
                                                 d="M10.375 13.75C10.375 14.72 11.125 15.5 12.045 15.5H13.925C14.725 15.5 15.375 14.82 15.375 13.97C15.375 13.06 14.975 12.73 14.385 12.52L11.375 11.47C10.785 11.26 10.385 10.94 10.385 10.02C10.385 9.17999 11.035 8.48999 11.835 8.48999H13.715C14.635 8.48999 15.385 9.26999 15.385 10.24"
@@ -245,12 +230,15 @@ export function Home() {
                                             <Path d="M22.875 2L17.875 7" stroke="black" strokeWidth="1.2"
                                                   stroke-linecap="round" stroke-linejoin="round"/>
                                         </Svg>
+
                                         <Text style={{fontFamily: 'Sora-SemiBold', marginTop: 10, textAlign: 'center'}}>
-                                            Send
+                                            Deposit
                                         </Text>
                                     </TouchableOpacity>
 
-                                    <TouchableOpacity style={{paddingTop: 5}}>
+                                    <TouchableOpacity onPress={() =>
+                                        navigation.push('Scanner')
+                                    } style={{paddingTop: 5}}>
 
 
                                         <Svg width="36" height="36" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -266,7 +254,7 @@ export function Home() {
                                         </Text>
                                     </TouchableOpacity>
 
-                                    <TouchableOpacity  onPress={() => panelRef.current.togglePanel()}>
+                                    <TouchableOpacity  onPress={() => handleQR()}>
 
 
                                         <Svg  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -284,19 +272,7 @@ export function Home() {
                                         </Text>
                                     </TouchableOpacity>
 
-                                    <TouchableOpacity>
 
-
-                                        <Svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                             strokeWidth={1} stroke="black" width={45} height={45}>
-                                            <Path strokeLinecap="round" strokeLinejoin="round"
-                                                  d="M9 8.25H7.5a2.25 2.25 0 00-2.25 2.25v9a2.25 2.25 0 002.25 2.25h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25H15M9 12l3 3m0 0l3-3m-3 3V2.25"/>
-                                        </Svg>
-
-                                        <Text style={{fontFamily: 'Sora-SemiBold', marginTop: 10, textAlign: 'left'}}>
-                                            Deposit
-                                        </Text>
-                                    </TouchableOpacity>
 
 
                                 </View>
@@ -432,6 +408,8 @@ export function Home() {
                     initialRouteName="Home">
                     <Stack.Screen name="Home" component={HomeComp}/>
                     <Stack.Screen name="Scanner" component={Scanner}/>
+                    <Stack.Screen name="Keypad" component={Keypad}/>
+
                 </Stack.Navigator>
             </NavigationContainer>
         )

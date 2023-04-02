@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
   },
   card: {
     //marginTop: 5,
-    //height: 16,
+    height: 16,
     width: 350,
     //flexDirection: 'row',
     //justifyContent: 'left',

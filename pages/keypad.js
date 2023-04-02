@@ -22,7 +22,7 @@ import { SafeAreaView } from "react-navigation";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
 
-export function Keypad(props) {
+export const Keypad = ({navigation}) => {
 
     const [digit, setKey] = useState("");
 

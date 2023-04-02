@@ -1,63 +1,76 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, StyleSheet, Button, Dimensions } from 'react-native';
+import {Text, View, StyleSheet, Button, Dimensions, TouchableHighlight, TouchableOpacity} from 'react-native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import Ionicons from "react-native-vector-icons/Ionicons";
 import {Keypad} from "./keypad";
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
+import * as Haptics from "expo-haptics";
 
 
-export default function Scanner() {
-  const Stack = createStackNavigator();
 
-  const [hasPermission, setHasPermission] = useState(null);
-  const [scanned, setScanned] = useState(false);
 
-  useEffect(() => {
-    (async () => {
-      const { status } = await BarCodeScanner.requestPermissionsAsync();
-      setHasPermission(status === 'granted');
-    })();
-  }, []);
 
-  const handleBarCodeScanned = ({ type, data }) => {
-  };
 
-  if (hasPermission === null) {
-    return <Text>Requesting for camera permission</Text>;
-  }
-  if (hasPermission === false) {
-    return <Text>No access to camera</Text>;
-  }
+  export const Scanner = ({navigation}) => {
 
-  function QRComponent(){
+    const Stack = createStackNavigator();
+
+    const [hasPermission, setHasPermission] = useState(null);
+    const [scanned, setScanned] = useState(false);
+
+    useEffect(() => {
+      (async () => {
+        const {status} = await BarCodeScanner.requestPermissionsAsync();
+        setHasPermission(status === 'granted');
+      })();
+    }, []);
+
+    const handleBarCodeScanned = ({type, data}) => {
+      setScanned(true);
+      navigation.push('Keypad')
+    };
+
+    if (hasPermission === null) {
+      return <Text>Requesting for camera permission</Text>;
+    }
+    if (hasPermission === false) {
+      return <Text>No access to camera</Text>;
+    }
+
+
     return (
         <View style={styles.container}>
+          <TouchableOpacity onPress={
+            () => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              navigation.navigate('Home')
+
+            }
+          } style={{
+            position: 'absolute',
+            flexDirection: 'row',
+            borderRadius: 100,
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: 40,
+            width: 40,
+            backgroundColor: 'white',
+            zIndex: 100,
+            left: 20,
+            top: 70
+          }}>
+            <Ionicons name={"chevron-back-outline"} size={20}/>
+          </TouchableOpacity>
           <BarCodeScanner
-              onBarCodeScanned={scanned ? undefined : <Keypad/>}
+              onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
               style={StyleSheet.absoluteFillObject}
           />
-          {scanned && <Button title={'Tap to Scan Again'} onPress={() => setScanned(false)} />}
+          {scanned && <Button title={'Tap to Scan Again'} onPress={() => setScanned(false)}/>}
         </View>
     )
+
   }
-
-  return (
-      <NavigationContainer  independent={true}>
-        <Stack.Navigator
-            screenOptions={{
-              headerShown: false
-            }}
-            initialRouteName="QR">
-        <Stack.Screen name="QR" component={QRComponent} />
-        <Stack.Screen name="Send" component={Keypad} />
-      </Stack.Navigator>
-      </NavigationContainer>
-
-
-  );
-}
-
 
 const styles = StyleSheet.create({
   header: {
