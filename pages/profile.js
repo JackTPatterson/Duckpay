@@ -20,27 +20,27 @@ export function Profile() {
     const panelRef = React.useRef(null);
     return (
         <View style={styles.container}>
-
             <View style={styles.header}>
                 <View
                     style={styles.headerContent}>
-                    <Text style={styles.titlename}>Profile</Text>
                     <Image
                         style={styles.avatar}
                         source={{uri: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'}}
                     />
-                    <Text style={styles.name}>Big Doodoo</Text>
-                    <Text style={styles.email}>bigdoodoo@yahoo.com</Text>
+                    <Text style={styles.name}>Jack Patterson</Text>
+                    <Text style={styles.email}>fakeemail@gmail.com</Text>
                 </View>
             </View>
             <View style={styles.body}>
                 <View style={styles.bodyContent}>
                     <TouchableOpacity style={styles.buttonContainer}>
+                        <View style={styles.buttonIcon}>
                         <Ionicons
-                            style={styles.buttonIcon}
-                            name={"man-outline"}
+
+                            name={"person-circle-outline"}
                             size={28}>
                         </Ionicons>
+                        </View>
                         <Text style={styles.buttonText}>Account</Text>
                         <Ionicons
                             style={styles.buttonArrow}
@@ -49,11 +49,13 @@ export function Profile() {
                         </Ionicons>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.buttonContainer}>
+                        <View style={styles.buttonIcon}>
+
                         <Ionicons
-                            style={styles.buttonIcon}
                             name={"card-outline"}
                             size={28}>
                         </Ionicons>
+                        </View>
                         <Text style={styles.buttonText}>Payment</Text>
                         <Ionicons
                             style={styles.buttonArrow}
@@ -62,11 +64,13 @@ export function Profile() {
                         </Ionicons>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.buttonContainer}>
+                        <View style={styles.buttonIcon}>
+
                         <Ionicons
-                            style={styles.buttonIcon}
                             name={"shield-checkmark-outline"}
                             size={28}>
                         </Ionicons>
+                        </View>
                         <Text style={styles.buttonText}>Security</Text>
                         <Ionicons
                             style={styles.buttonArrow}
@@ -75,11 +79,13 @@ export function Profile() {
                         </Ionicons>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.buttonContainer}>
+                        <View style={styles.buttonIcon}>
+
                         <Ionicons
-                            style={styles.buttonIcon}
                             name={"notifications-outline"}
                             size={28}>
                         </Ionicons>
+                        </View>
                         <Text style={styles.buttonText}>Notifications</Text>
                         <Ionicons
                             style={styles.buttonArrow}
@@ -88,11 +94,13 @@ export function Profile() {
                         </Ionicons>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.buttonContainer}>
+                        <View style={styles.buttonIcon}>
+
                         <Ionicons
-                            style={styles.buttonIcon}
                             name={"share-social-outline"}
                             size={28}>
                         </Ionicons>
+                        </View>
                         <Text style={styles.buttonText}>Social</Text>
                         <Ionicons
                             style={styles.buttonArrow}
@@ -101,11 +109,13 @@ export function Profile() {
                         </Ionicons>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.buttonContainer}>
+                        <View style={styles.buttonIcon}>
+
                         <Ionicons
-                            style={styles.buttonIcon}
                             name={"information-circle-outline"}
                             size={28}>
                         </Ionicons>
+                        </View>
                         <Text style={styles.buttonText}>Help</Text>
                         <Ionicons
                             style={styles.buttonArrow}
@@ -133,7 +143,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
     },
     headerContent: {
-        marginTop: 5,
+        marginTop: 50,
         padding: 30,
         alignItems: 'center',
     },
@@ -150,12 +160,15 @@ const styles = StyleSheet.create({
         color: '#000000',
         fontWeight: '60',
         marginBottom: 5,
+        fontFamily: 'Sora-SemiBold'
 
     },
     email: {
         fontSize: 12,
         color: 'grey',
         fontWeight: '60',
+        fontFamily: 'Sora-Regular'
+
     },
     titlename: {
         fontSize: 22,
@@ -202,8 +215,6 @@ const styles = StyleSheet.create({
         marginBottom: 5,
         width: 350,
         borderRadius: 15,
-        borderColor: '#355af9',
-        borderWidth: 1,
 
 
     },
@@ -221,6 +232,9 @@ const styles = StyleSheet.create({
     },
     buttonIcon: {
         padding: 15,
+        backgroundColor: '#f9f9f9',
+        borderRadius: 50,
+        marginRight: 20,
         //flexDirection: 'row',
     },
     buttonArrow: {

@@ -28,7 +28,7 @@ import * as Haptics from "expo-haptics";
 
     const handleBarCodeScanned = ({type, data}) => {
       setScanned(true);
-      navigation.push('Keypad')
+      navigation.push('Keypad', {data: "Aidan Nestor"})
     };
 
     if (hasPermission === null) {

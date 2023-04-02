@@ -12,10 +12,9 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 import { Home } from "./pages/home";
-import { CardInfo } from "./pages/cardInfo";
+import { Shops } from "./pages/Shops";
 import { Notifications } from "./pages/notifications";
 import { Profile } from "./pages/profile";
-import { Scanner } from "./pages/Scanner";
 import { Keypad } from "./pages/keypad";
 
 
@@ -24,7 +23,7 @@ const Tab = createBottomTabNavigator();
 
 export default function App() {
 
-  
+    console.disableYellowBox = true;
   
  
   return (
@@ -85,7 +84,7 @@ export default function App() {
           })}
         >
           <Tab.Screen name="Home" component={Home} />
-          <Tab.Screen name="Business" component={Keypad} />
+          <Tab.Screen name="Business" component={Shops} />
           <Tab.Screen name="Notifications" component={Notifications} />
 
           <Tab.Screen name="Profile" component={Profile} />
