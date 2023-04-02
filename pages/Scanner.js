@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import {Text, View, StyleSheet, Button, Dimensions, TouchableHighlight, TouchableOpacity} from 'react-native';
+import {Text, View, StyleSheet, Button, TouchableOpacity} from 'react-native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import Ionicons from "react-native-vector-icons/Ionicons";
 import {Keypad} from "./keypad";
-import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import * as Haptics from "expo-haptics";
 

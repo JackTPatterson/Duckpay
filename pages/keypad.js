@@ -1,11 +1,9 @@
-import {StatusBar} from "expo-status-bar";
 import {
     StyleSheet,
     Text,
-    TextInput,
     TouchableOpacity,
     View,
-    AppLoading, Dimensions, Easing, ActivityIndicator,
+    AppLoading, Dimensions, Easing,
 
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -21,8 +19,6 @@ import * as Haptics from "expo-haptics";
 import * as React from "react";
 import {SafeAreaView} from "react-navigation";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import QRCodeStyled from "react-native-qrcode-styled";
-
 
 export const Keypad = ({navigation, route}) => {
 

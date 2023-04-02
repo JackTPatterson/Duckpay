@@ -1,11 +1,8 @@
-import {StatusBar} from "expo-status-bar";
 import {
     StyleSheet,
     Text,
-    TextInput,
     TouchableOpacity,
     View,
-    Image,
     Dimensions, AppLoading, Button, Easing,
 } from "react-native";
 import {
@@ -14,28 +11,17 @@ import {
 
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
-
-
-import {useEffect, useState, useRef, useCallback, useMemo} from "react";
-
+import {useEffect, useState, useRef} from "react";
 import * as Haptics from "expo-haptics";
-
 import * as React from "react";
 import {SafeAreaView} from "react-navigation";
 import QRCodeStyled from 'react-native-qrcode-styled';
-
 import Svg, {
     Path,
-    Line,
-    Polyline
 } from 'react-native-svg';
-import {ScrollView} from "react-native-gesture-handler";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import {Keypad} from "./keypad";
-
-import {BarCodeScanner} from "expo-barcode-scanner";
 import BottomSheet from "react-native-simple-bottom-sheet";
-
 import {Scanner} from './Scanner';
 import {SendComp} from "./Send";
 import LottieView from "lottie-react-native";

@@ -1,20 +1,6 @@
-import { StatusBar } from "expo-status-bar";
-import {StyleSheet, Text, TextInput, ImageBackground, TouchableOpacity, View, Easing} from "react-native";
-
-import MaterialCommunityIcons from "react-native-vector-icons/Ionicons";
-import { TailwindProvider } from "tailwindcss-react-native";
-
-
-import BottomSheet from "react-native-simple-bottom-sheet";
-
-import * as Haptics from "expo-haptics";
-
+import {StyleSheet, Text, View, Easing} from "react-native";
 import * as React from "react";
 import { SafeAreaView } from "react-navigation";
-
-
-
-import QRCode from "react-native-qrcode-svg";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
 

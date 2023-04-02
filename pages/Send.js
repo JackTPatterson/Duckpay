@@ -1,12 +1,6 @@
-import { StatusBar } from "expo-status-bar";
-import {AppLoading, StyleSheet, Text, TextInput, TouchableHighlight, TouchableOpacity, View} from "react-native";
+import {AppLoading, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
 
 import MaterialCommunityIcons from "react-native-vector-icons/Ionicons";
-import { TailwindProvider } from "tailwindcss-react-native";
-
-
-import BottomSheet from "react-native-simple-bottom-sheet";
-
 import * as Haptics from "expo-haptics";
 
 import * as React from "react";
