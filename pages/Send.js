@@ -7,6 +7,8 @@ import * as React from "react";
 import { SafeAreaView } from "react-navigation";
 import {useFonts} from "expo-font";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import {UserBox} from "../components/UserBox";
+import Svg, {Path} from "react-native-svg";
 
 export const SendComp = ({navigation}) => {
 
@@ -22,247 +24,54 @@ export const SendComp = ({navigation}) => {
             <View>
                 <SafeAreaView style={styles.body}>
                     <View
-
                         style={{
                             flexDirection: "row",
                             justifyContent: "space-between",
                             alignItems: "center",
                             marginBottom: 20,
-                        }}
-                    >
+                        }}>
                         <TouchableOpacity onPress={()=>{
                             navigation.pop();
                             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-
                         }}>
-                            <Ionicons name={"arrow-back-outline"} size={36}/>
+                            <Ionicons name={"chevron-back-outline"} size={30}/>
                         </TouchableOpacity>
                         <Text style={{fontFamily: 'Sora-SemiBold', fontSize: 24}}>Send</Text>
                         <Ionicons style={{color: 'white'}} name={"arrow-back-outline"} size={36}/>
-
-
                     </View>
-                    <View style={{flexDirection: 'row', alignItems: 'center', border: 'black', borderWidth: 1, borderColor: '#d1d1d1', borderRadius: '100%', paddingHorizontal: 10, paddingVertical: 10}}>
-                        <MaterialCommunityIcons style={{marginRight: 10}} name="search" size={30} color="#000" />
+                    <View style={{flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#aaacae', borderRadius: 15, paddingHorizontal: 10, paddingVertical: 16}}>
+
+                        <Svg style={{marginRight: 10}} width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <Path d="M11.5 21C16.7467 21 21 16.7467 21 11.5C21 6.25329 16.7467 2 11.5 2C6.25329 2 2 6.25329 2 11.5C2 16.7467 6.25329 21 11.5 21Z" stroke={"black"} strokeWidth={2} stroke-linecap="round" stroke-linejoin="round"/>
+                            <Path d="M22 22L20 20" stroke={"black"} strokeWidth={2} stroke-linecap="round" stroke-linejoin="round"/>
+                        </Svg>
+
                         <View>
-                            <TextInput placeholder="Search Users" style={{fontSize: 15, fontWeight: 'medium', width: '100%'}}/>
+                            <TextInput placeholder="Search Student" style={{fontSize: 15, fontFamily: 'Sora-Regular', width: '100%'}}/>
                         </View>
                     </View>
 
-                    <TouchableOpacity onPress={()=>{
-                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                        navigation.push("Keypad", {data: "Cammie Boas"})
+                    <View style={{
+                        width: '100%',
+                        borderRadius: 14,
+                        marginTop: 20
                     }}>
 
-                    <View style={{
+                        <Text style={{
+                            fontSize: 20,
+                            fontFamily: 'Sora-Regular',
+                        }}>Friends</Text><View style={{
                         flexDirection: 'row',
                         justifyContent: 'space-between',
                         alignItems: 'center',
-                        marginTop: 20
                     }}>
-                        <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                            <View style={{
-                                height: 50,
-                                width: 50,
-                                backgroundColor: 'white',
-                                borderRadius: '100%',
-                                flexDirection: 'row',
-                                justifyContent: 'center',
-                                alignItems: 'center'
-                            }}>
-                                <Ionicons size={40} name={'person-circle-outline'}></Ionicons>
-                            </View>
-                            <View style={{marginLeft: 10}}>
-                                <Text style={{fontFamily: 'Sora-SemiBold'}}>Cammie Boas</Text>
-                            </View>
-                        </View>
 
+                        <UserBox navigate={navigation} name={"Samuel Longley"}/>
+                        <UserBox navigate={navigation} name={"Samuel Longley"}/>
+                        <UserBox navigate={navigation} name={"Samuel Longley"}/>
+                        <UserBox navigate={navigation} name={"Samuel Longley"}/>
 
                     </View>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={()=>{
-                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                        navigation.push("Keypad", {data: "Samuel Longley"})
-                    }}>
-                    <View style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        marginTop: 20
-                    }}>
-                        <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                            <View style={{
-                                height: 50,
-                                width: 50,
-                                backgroundColor: 'white',
-                                borderRadius: '100%',
-                                flexDirection: 'row',
-                                justifyContent: 'center',
-                                alignItems: 'center'
-                            }}>
-                                <Ionicons size={40} name={'person-circle-outline'}></Ionicons>
-                            </View>
-                            <View style={{marginLeft: 10}}>
-                                <Text style={{fontFamily: 'Sora-SemiBold'}}>Samuel Longley</Text>
-                            </View>
-                        </View>
-
-
-                    </View>
-                    </TouchableOpacity>
-                    <View style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        marginTop: 20
-                    }}>
-                        <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                            <View style={{
-                                height: 50,
-                                width: 50,
-                                backgroundColor: 'white',
-                                borderRadius: '100%',
-                                flexDirection: 'row',
-                                justifyContent: 'center',
-                                alignItems: 'center'
-                            }}>
-                                <Ionicons size={40} name={'person-circle-outline'}></Ionicons>
-                            </View>
-                            <View style={{marginLeft: 10}}>
-                                <Text style={{fontFamily: 'Sora-SemiBold'}}>Alicia David</Text>
-                            </View>
-                        </View>
-
-
-                    </View>
-                    <View style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        marginTop: 20
-                    }}>
-                        <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                            <View style={{
-                                height: 50,
-                                width: 50,
-                                backgroundColor: 'white',
-                                borderRadius: '100%',
-                                flexDirection: 'row',
-                                justifyContent: 'center',
-                                alignItems: 'center'
-                            }}>
-                                <Ionicons size={40} name={'person-circle-outline'}></Ionicons>
-                            </View>
-                            <View style={{marginLeft: 10}}>
-                                <Text style={{fontFamily: 'Sora-SemiBold'}}>Danyal Thomson
-                                </Text>
-                            </View>
-                        </View>
-
-
-                    </View>
-                    <View style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        marginTop: 20
-                    }}>
-                        <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                            <View style={{
-                                height: 50,
-                                width: 50,
-                                backgroundColor: 'white',
-                                borderRadius: '100%',
-                                flexDirection: 'row',
-                                justifyContent: 'center',
-                                alignItems: 'center'
-                            }}>
-                                <Ionicons size={40} name={'person-circle-outline'}></Ionicons>
-                            </View>
-                            <View style={{marginLeft: 10}}>
-                                <Text style={{fontFamily: 'Sora-SemiBold'}}>Eddie Haley
-                                </Text>
-                            </View>
-                        </View>
-
-
-                    </View>
-                    <View style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        marginTop: 20
-                    }}>
-                        <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                            <View style={{
-                                height: 50,
-                                width: 50,
-                                backgroundColor: 'white',
-                                borderRadius: '100%',
-                                flexDirection: 'row',
-                                justifyContent: 'center',
-                                alignItems: 'center'
-                            }}>
-                                <Ionicons size={40} name={'person-circle-outline'}></Ionicons>
-                            </View>
-                            <View style={{marginLeft: 10}}>
-                                <Text style={{fontFamily: 'Sora-SemiBold'}}>Jade Farley
-                                </Text>
-                            </View>
-                        </View>
-
-
-                    </View>
-                    <View style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        marginTop: 20
-                    }}>
-                        <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                            <View style={{
-                                height: 50,
-                                width: 50,
-                                backgroundColor: 'white',
-                                borderRadius: '100%',
-                                flexDirection: 'row',
-                                justifyContent: 'center',
-                                alignItems: 'center'
-                            }}>
-                                <Ionicons size={40} name={'person-circle-outline'}></Ionicons>
-                            </View>
-                            <View style={{marginLeft: 10}}>
-                                <Text style={{fontFamily: 'Sora-SemiBold'}}>Malik Cohen
-                                </Text>
-                            </View>
-                        </View>
-
-
-                    </View>
-                    <View style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        marginTop: 20
-                    }}>
-                        <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                            <View style={{
-                                height: 50,
-                                width: 50,
-                                backgroundColor: 'white',
-                                borderRadius: '100%',
-                                flexDirection: 'row',
-                                justifyContent: 'center',
-                                alignItems: 'center'
-                            }}>
-                                <Ionicons size={40} name={'person-circle-outline'}></Ionicons>
-                            </View>
-                            <View style={{marginLeft: 10}}>
-                                <Text style={{fontFamily: 'Sora-SemiBold'}}>Virginia Maddox
-                                </Text>
-                            </View>
-                        </View>
-
 
                     </View>
 

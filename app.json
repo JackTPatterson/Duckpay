@@ -1,8 +1,16 @@
 {
   "expo": {
-    "name": "TBSample",
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera."
+        }
+      ]
+    ],
+    "name": "duckpay",
     "scheme": "google",
-    "slug": "TBSample",
+    "slug": "duckpay",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -16,18 +24,28 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true,
+      "supportsTablet": false,
       "bundleIdentifier": "com.stevens.duckpay"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-
       },
+      "package": "com.stevens.duckpay",
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "82093d69-95d5-4db4-b5d3-b16f5b818f54"
+      }
+    },
+    "owner": "jacktyler03"
   }
 }

@@ -3,12 +3,16 @@ import {
     Text,
     TouchableOpacity,
     View,
-    Dimensions, AppLoading, Button, Easing,
+    Dimensions,
+    AppLoading,
+    Easing,
+    Share,
 } from "react-native";
 import {
     useFonts,
 } from "expo-font";
 
+import primaryColor from '../Constants';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {useEffect, useState, useRef} from "react";
@@ -25,16 +29,20 @@ import BottomSheet from "react-native-simple-bottom-sheet";
 import {Scanner} from './Scanner';
 import {SendComp} from "./Send";
 import LottieView from "lottie-react-native";
+import NumberTicker from "react-native-number-ticker";
+import {TransactionList} from "../components/TransactionList";
+import {UserBox} from "../components/UserBox";
+import users from "../Scripts/HandleDB";
+import getFriends from "../Scripts/HandleDB";
+import addFriend from "../Scripts/HandleDB";
+import getUser from "../Scripts/HandleDB";
+import {Setup} from "./Setup";
+import {GetID} from "./GetID";
 
 export function Home() {
-    let fontLoaded = useFonts({
-        "Sora-Regular": require("../assets/fonts/Sora-Regular.ttf"),
-        "Sora-SemiBold": require("../assets/fonts/Sora-SemiBold.ttf"),
-    });
 
     const panelRef = React.useRef(0);
     const panelRef2 = React.useRef(0);
-
     const panelRef3 = React.useRef(0);
 
 
@@ -49,30 +57,43 @@ export function Home() {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         panelRef.current.togglePanel();
     }
-
     function getBills() {
         setBalance("$300.50")
+        changeBalanceType(0);
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
 
     function getDiningDollars() {
         setBalance("$200.00")
+        changeBalanceType(1);
+
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
 
     function getSwipes() {
-        setBalance("145 Swipes")
+        setBalance("145")
+        changeBalanceType(2);
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
-
     const Stack = createStackNavigator();
 
-
     useEffect(() => {
-        setBalance("$300.50")
+        getBills();
     }, [])
 
+
+
+    let fontLoaded = useFonts({
+        "Sora-Regular": require("../assets/fonts/Sora-Regular.ttf"),
+        "Sora-SemiBold": require("../assets/fonts/Sora-SemiBold.ttf"),
+    });
+
     const HomeComp = ({navigation}) => {
+        if(!fontLoaded){
+            return <AppLoading/>
+        }
+        else
+
         return (
             <View>
                 <SafeAreaView style={styles.body}>
@@ -86,137 +107,45 @@ export function Home() {
                             }}
                         >
                             <Text style={styles.title}>Your Balance</Text>
-                            <Text style={{
-                                fontSize: 48,
-                                fontWeight: 400,
-                                marginTop: 10,
-                                fontFamily: 'Sora-SemiBold'
-                            }}>{balance}</Text>
+                            <NumberTicker
+                                number={balance}
+                                textSize={40}
+                                duration={300}
+                                isSecret={true}
+
+
+                                textStyle={{
+                                    width: "100%",
+                                    fontFamily: "Sora-SemiBold",
+                                }}
+                            />
 
                             <View style={{flexDirection: 'row', maxWidth: '100%', gap: 10, marginTop: 20}}>
-                                {balanceType === 0 ? (
-                                        <TouchableOpacity onPress={() => {
-                                            getBills();
-                                        }
-                                        } style={{
-                                            flex: 1,
-                                            backgroundColor: '#355af9',
-                                            borderRadius: '100%',
-                                            paddingVertical: 10
-                                        }}>
-                                            <Text style={{
-                                                fontFamily: 'Sora-SemiBold',
-                                                fontSize: 16,
-                                                textAlign: 'center',
-                                                color: 'white'
-                                            }}>DuckBills</Text>
-                                        </TouchableOpacity>
-                                    ) :
-                                    (
-                                        <TouchableOpacity onPress={() => {
-                                            getBills();
-                                            changeBalanceType(0)
-                                        }} style={{
-                                            flex: 1,
-                                            borderColor: '#355af9',
-                                            borderWidth: 1,
-                                            borderRadius: '100%',
-                                            paddingVertical: 10
-                                        }}>
-                                            <Text style={{
-                                                fontFamily: 'Sora-SemiBold',
-                                                fontSize: 16,
-                                                textAlign: 'center',
-                                                color: '#355af9'
-                                            }}>DuckBills</Text>
-                                        </TouchableOpacity>
-                                    )}
-
-                                {balanceType === 1 ? (
-                                        <TouchableOpacity onPress={() => {
-                                            getDiningDollars();
-                                            changeBalanceType(1);
+                                <TouchableOpacity onPress={() => {
+                                    getBills();
+                                }
+                                } style={balanceType === 0 ? styles.enabledButton : styles.disabledButton}>
+                                    <Text
+                                        style={balanceType === 0 ? styles.enabledText : styles.disabledText}>DuckBills</Text>
+                                </TouchableOpacity>
 
 
-                                        }} style={{
-                                            flex: 1,
-                                            backgroundColor: '#355af9',
-                                            borderRadius: '100%',
-                                            paddingVertical: 10
-                                        }}>
-                                            <Text style={{
-                                                fontFamily: 'Sora-SemiBold',
-                                                fontSize: 16,
-                                                textAlign: 'center',
-                                                color: 'white'
-                                            }}>Dining</Text>
-                                        </TouchableOpacity>
-                                    ) :
-                                    (
-                                        <TouchableOpacity onPress={() => {
-                                            getDiningDollars();
-
-                                            changeBalanceType(1);
-                                        }
-
-                                        } style={{
-                                            flex: 1,
-                                            borderColor: '#355af9',
-                                            borderWidth: 1,
-                                            borderRadius: '100%',
-                                            paddingVertical: 10
-                                        }}>
-                                            <Text style={{
-                                                fontFamily: 'Sora-SemiBold',
-                                                fontSize: 16,
-                                                textAlign: 'center',
-                                                color: '#355af9'
-                                            }}>Dining</Text>
-                                        </TouchableOpacity>
-                                    )}
-
-                                {balanceType === 2 ? (
-                                        <TouchableOpacity onPress={() => {
-                                            getSwipes();
-                                            changeBalanceType(2);
+                                <TouchableOpacity onPress={() => {
+                                    getDiningDollars();
 
 
-                                        }} style={{
-                                            flex: 1,
-                                            backgroundColor: '#355af9',
-                                            borderRadius: '100%',
-                                            paddingVertical: 10
-                                        }}>
-                                            <Text style={{
-                                                fontFamily: 'Sora-SemiBold',
-                                                fontSize: 16,
-                                                textAlign: 'center',
-                                                color: 'white'
-                                            }}>Swipes</Text>
-                                        </TouchableOpacity>
-                                    ) :
-                                    (
-                                        <TouchableOpacity onPress={() => {
-                                            getSwipes();
+                                }} style={balanceType === 1 ? styles.enabledButton : styles.disabledButton}>
+                                    <Text
+                                        style={balanceType === 1 ? styles.enabledText : styles.disabledText}>Dining</Text>
+                                </TouchableOpacity>
 
-                                            changeBalanceType(2);
-                                        }
 
-                                        } style={{
-                                            flex: 1,
-                                            borderColor: '#355af9',
-                                            borderWidth: 1,
-                                            borderRadius: '100%',
-                                            paddingVertical: 10
-                                        }}>
-                                            <Text style={{
-                                                fontFamily: 'Sora-SemiBold',
-                                                fontSize: 16,
-                                                textAlign: 'center',
-                                                color: '#355af9'
-                                            }}>Swipes</Text>
-                                        </TouchableOpacity>
-                                    )}
+                                <TouchableOpacity onPress={() => {
+                                    getSwipes();
+                                }} style={balanceType === 2 ? styles.enabledButton : styles.disabledButton}>
+                                    <Text
+                                        style={balanceType === 2 ? styles.enabledText : styles.disabledText}>Swipes</Text>
+                                </TouchableOpacity>
 
                             </View>
 
@@ -235,7 +164,7 @@ export function Home() {
                                     padding: 20,
                                     borderRadius: 14,
                                     flexDirection: 'row',
-                                    justifyContent: 'space-around',
+                                    justifyContent: 'space-between',
                                     gap: 10
                                 }}>
 
@@ -334,8 +263,6 @@ export function Home() {
                                     <TouchableOpacity onPress={() => {
                                         handleQR();
                                     }}>
-
-
                                         <Svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                              strokeWidth={1.2} stroke="black" width={45} height={45}>
                                             <Path strokeLinecap="round" strokeLinejoin="round"
@@ -375,66 +302,40 @@ export function Home() {
                                     }}>
                                         <Text style={{
                                             fontSize: 20,
+                                            marginBottom: 20,
+
                                             fontFamily: 'Sora-Regular',
                                         }}>Recent Transactions</Text>
                                     </View>
-                                    <View style={{
-                                        flexDirection: 'row',
-                                        justifyContent: 'space-between',
-                                        alignItems: 'center',
-                                        marginTop: 20
-                                    }}>
-                                        <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                                            <View style={{
-                                                height: 50,
-                                                width: 50,
-                                                backgroundColor: 'white',
-                                                borderRadius: '100%',
-                                                flexDirection: 'row',
-                                                justifyContent: 'center',
-                                                alignItems: 'center'
-                                            }}>
-                                                <Ionicons size={40} name={'person-circle-outline'}></Ionicons>
-                                            </View>
-                                            <View style={{marginLeft: 10}}>
-                                                <Text style={{fontFamily: 'Sora-SemiBold'}}>Cammie Boas</Text>
-                                                <Text style={{color: '#aaacae', fontFamily: 'Sora-Regular'}}>Feb
-                                                    15</Text>
-                                            </View>
-                                        </View>
-                                        <Text style={{color: 'red'}}>-$2.00</Text>
+                                    <TransactionList info={"Monday, 15 January"} change={"+$13.00"} name={"Samuel Longley"}/>
+                                    <TransactionList info={"Monday, 15 January"} change={"+$13.00"} name={"Samuel Longley"}/>
+                                    <TouchableOpacity onPress={()=> {(getUser("20011188")).then((res => console.log(res)))}}>
+                                        <Text>Test</Text>
+                                    </TouchableOpacity>
 
-
-                                    </View>
-                                    <View style={{
-                                        flexDirection: 'row',
-                                        justifyContent: 'space-between',
-                                        alignItems: 'center',
-                                        marginTop: 20
-                                    }}>
-                                        <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                                            <View style={{
-                                                height: 50,
-                                                width: 50,
-                                                backgroundColor: 'white',
-                                                borderRadius: '100%',
-                                                flexDirection: 'row',
-                                                justifyContent: 'center',
-                                                alignItems: 'center'
-                                            }}>
-                                                <Ionicons size={40} name={'person-circle-outline'}></Ionicons>
-                                            </View>
-                                            <View style={{marginLeft: 10}}>
-                                                <Text style={{fontFamily: 'Sora-SemiBold'}}>Samuel Longley</Text>
-                                                <Text style={{color: '#aaacae'}}>Feb 15</Text>
-                                            </View>
-                                        </View>
-                                        <Text style={{color: 'green'}}>+$13.00</Text>
-
-
-                                    </View>
                                 </View>
+                            </View>
+                            <View style={{
+                                width: '100%',
+                                borderRadius: 14,
+                                marginTop: 20
+                            }}>
 
+                                <Text style={{
+                                    fontSize: 20,
+                                    fontFamily: 'Sora-Regular',
+                                }}>Quick Pay</Text><View style={{
+                                flexDirection: 'row',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                            }}>
+
+                                <UserBox navigate={navigation} name={"Samuel Longley"}/>
+                                <UserBox navigate={navigation} name={"Samuel Longley"}/>
+                                <UserBox navigate={navigation} name={"Samuel Longley"}/>
+                                <UserBox navigate={navigation} name={"Samuel Longley"}/>
+
+                            </View>
 
                             </View>
                         </View>
@@ -457,16 +358,21 @@ export function Home() {
                             justifyContent: "space-between",
                         }}>
                             <View>
-                                <Text style={{
-                                    fontSize: 24,
-                                    fontFamily: 'Sora-SemiBold',
-                                    marginBottom: 30,
-                                    textAlign: 'center'
-                                }}>My QR Code</Text>
+                                <View style={{flexDirection: "row", width: '100%', alignItems: 'center', marginBottom: 30, justifyContent: 'space-between'}}>
+                                    <Text style={{
+                                        fontSize: 24,
+                                        fontFamily: 'Sora-SemiBold',
+                                        textAlign: 'center'
+                                    }}>My QR Code</Text>
+                                    <TouchableOpacity onPress={()=>panelRef.current.togglePanel()}>
+                                        <Ionicons name={"close-circle-outline"} size={35}/>
+                                    </TouchableOpacity>
+                                </View>
+
                                 <View style={{flexDirection: 'row', justifyContent: 'center'}}>
                                     <QRCodeStyled
                                         data={'Simple QR Code'}
-                                        style={{backgroundColor: 'white'}}
+                                        style={{backgroundColor: 'white', borderRadius: 20, borderWidth: 1, borderColor: "black"}}
                                         padding={20}
                                         pieceSize={12}
                                         innerEyesOptions={{borderRadius: 5}}
@@ -475,7 +381,56 @@ export function Home() {
 
                                     />
                                 </View>
+                                <View style={{flexDirection: 'row', justifyContent: 'center'}}>
+                                <TouchableOpacity onPress={ async () => {
+
+                                    Share.share({
+                                        message: "Share Student ID"
+                                    })
+                                        .then((result) => console.log(result))
+                                        .catch((errorMsg) => console.log(errorMsg));
+
+
+
+                                }} style={{
+                                    borderWidth: 1,
+                                    borderColor: 'black',
+                                    padding: 15,
+                                    borderRadius: '100%',
+                                    marginTop: 20,
+                                    marginHorizontal: 10
+                                }}>
+                                    <Svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <Path d="M16.96 6.16998C18.96 7.55998 20.34 9.76998 20.62 12.32" stroke={"black"} strokeWidth={2} stroke-linecap="round" stroke-linejoin="round"/>
+                                        <Path d="M3.48999 12.37C3.74999 9.82997 5.10999 7.61997 7.08999 6.21997" stroke={"black"} strokeWidth={2} stroke-linecap="round" stroke-linejoin="round"/>
+                                        <Path d="M8.18994 20.94C9.34994 21.53 10.6699 21.86 12.0599 21.86C13.3999 21.86 14.6599 21.56 15.7899 21.01" stroke={"black"} strokeWidth={2} stroke-linecap="round" stroke-linejoin="round"/>
+                                        <Path d="M12.06 7.70001C13.5954 7.70001 14.84 6.45537 14.84 4.92001C14.84 3.38466 13.5954 2.14001 12.06 2.14001C10.5247 2.14001 9.28003 3.38466 9.28003 4.92001C9.28003 6.45537 10.5247 7.70001 12.06 7.70001Z" stroke={"black"} strokeWidth={2} stroke-linecap="round" stroke-linejoin="round"/>
+                                        <Path d="M4.83005 19.92C6.3654 19.92 7.61005 18.6753 7.61005 17.14C7.61005 15.6046 6.3654 14.36 4.83005 14.36C3.2947 14.36 2.05005 15.6046 2.05005 17.14C2.05005 18.6753 3.2947 19.92 4.83005 19.92Z" stroke={"black"} strokeWidth={2} stroke-linecap="round" stroke-linejoin="round"/>
+                                        <Path d="M19.1699 19.92C20.7052 19.92 21.9499 18.6753 21.9499 17.14C21.9499 15.6046 20.7052 14.36 19.1699 14.36C17.6345 14.36 16.3899 15.6046 16.3899 17.14C16.3899 18.6753 17.6345 19.92 19.1699 19.92Z" stroke={"black"} strokeWidth={2} stroke-linecap="round" stroke-linejoin="round"/>
+                                    </Svg>
+
+                                </TouchableOpacity>
+                                    <TouchableOpacity onPress={ async () => {
+                                    }} style={{
+                                        borderWidth: 1,
+                                        borderColor: 'black',
+                                        padding: 15,
+                                        borderRadius: '100%',
+                                        marginTop: 20,
+                                        marginHorizontal: 10
+
+                                    }}>
+                                        <Svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <Path d="M16 12.9V17.1C16 20.6 14.6 22 11.1 22H6.9C3.4 22 2 20.6 2 17.1V12.9C2 9.4 3.4 8 6.9 8H11.1C14.6 8 16 9.4 16 12.9Z" stroke={"black"} strokeWidth={2} stroke-linecap="round" stroke-linejoin="round"/>
+                                            <Path d="M22 6.9V11.1C22 14.6 20.6 16 17.1 16H16V12.9C16 9.4 14.6 8 11.1 8H8V6.9C8 3.4 9.4 2 12.9 2H17.1C20.6 2 22 3.4 22 6.9Z" stroke={"black"} strokeWidth={2} stroke-linecap="round" stroke-linejoin="round"/>
+                                        </Svg>
+
+
+
+                                    </TouchableOpacity>
+                                </View>
                             </View>
+
 
 
                             <View style={{
@@ -486,20 +441,7 @@ export function Home() {
                                 gap: 10,
                                 marginTop: 50
                             }}>
-                                <TouchableOpacity onPress={() => panelRef.current.togglePanel()} style={{
-                                    width: '50%',
-                                    borderColor: 'black',
-                                    borderWidth: 1,
-                                    borderRadius: '100%',
-                                    paddingVertical: 10
-                                }}>
-                                    <Text style={{
-                                        fontWeight: 600,
-                                        fontSize: 20,
-                                        textAlign: 'center',
-                                        fontFamily: 'Sora-SemiBold',
-                                    }}>Close</Text>
-                                </TouchableOpacity>
+
                             </View>
                         </View>
 
@@ -517,7 +459,16 @@ export function Home() {
                         }}
                         ref={(ref) => (panelRef2.current = ref)}
                     >
-                        <Text style={{fontSize: 24, fontFamily: 'Sora-SemiBold'}}>Deposit</Text>
+                        <View style={{flexDirection: "row", width: '100%', alignItems: 'center', marginBottom: 30, justifyContent: 'space-between'}}>
+                            <Text style={{
+                                fontSize: 24,
+                                fontFamily: 'Sora-SemiBold',
+                                textAlign: 'center'
+                            }}>Deposit</Text>
+                            <TouchableOpacity onPress={()=>panelRef2.current.togglePanel()}>
+                                <Ionicons name={"close-circle-outline"} size={35}/>
+                            </TouchableOpacity>
+                        </View>
                         <View style={{flexDirection: 'row', gap: 10}}>
                             <TouchableOpacity onPress={() => {
                                 panelRef2.current.togglePanel();
@@ -592,7 +543,7 @@ export function Home() {
                                 marginBottom: 20,
                             }}>
                                 <Text
-                                    style={{fontSize: 16,  textAlign: 'center', fontFamily: 'Sora-SemiBold',}}>$50</Text>
+                                    style={{fontSize: 16, textAlign: 'center', fontFamily: 'Sora-SemiBold',}}>$50</Text>
 
                             </TouchableOpacity>
                             <TouchableOpacity onPress={() => panelRef2.current.togglePanel()} style={{
@@ -620,11 +571,11 @@ export function Home() {
 
                     <BottomSheet
                         animationDuration={500}
-                        onOpen={()=> {
+                        onOpen={() => {
                             animation.current?.play()
                         }}
 
-                        onClose={()=>{
+                        onClose={() => {
                             animation.current?.reset()
                         }}
                         animation={Easing.inOut(Easing.poly(5))}
@@ -643,12 +594,16 @@ export function Home() {
                             justifyContent: "space-between",
                         }}>
                             <View>
-                                <Text style={{
-                                    fontSize: 24,
-                                    fontFamily: 'Sora-SemiBold',
-                                    marginBottom: 30,
-                                    textAlign: 'center'
-                                }}>Deposit Successful</Text>
+                                <View style={{flexDirection: "row", width: '100%', alignItems: 'center', marginBottom: 30, justifyContent: 'space-between'}}>
+                                    <Text style={{
+                                        fontSize: 24,
+                                        fontFamily: 'Sora-SemiBold',
+                                        textAlign: 'center'
+                                    }}>Deposit Successful</Text>
+                                    <TouchableOpacity onPress={()=>panelRef3.current.togglePanel()}>
+                                        <Ionicons name={"close-circle-outline"} size={35}/>
+                                    </TouchableOpacity>
+                                </View>
                                 <View style={{flexDirection: 'row', justifyContent: 'center'}}>
                                     <LottieView
 
@@ -674,23 +629,7 @@ export function Home() {
                                 gap: 10,
                                 marginTop: 20
                             }}>
-                                <TouchableOpacity onPress={() => {
-                                    panelRef3.current.togglePanel();
-                                }
-                                } style={{
-                                    width: '50%',
-                                    borderColor: 'black',
-                                    borderWidth: 1,
-                                    borderRadius: '100%',
-                                    paddingVertical: 10
-                                }}>
-                                    <Text style={{
-                                        fontWeight: 600,
-                                        fontSize: 20,
-                                        textAlign: 'center',
-                                        fontFamily: 'Sora-SemiBold',
-                                    }}>Close</Text>
-                                </TouchableOpacity>
+
                             </View>
 
                         </View>
@@ -702,18 +641,25 @@ export function Home() {
     }
 
 
-    if (!fontLoaded)
-        return <AppLoading/>
-    else
+
+
+        if(!fontLoaded){
+            return <AppLoading/>
+        }
+        else
+
         return (
 
             <NavigationContainer independent={true}>
                 <Stack.Navigator
                     screenOptions={{
-                        headerShown: false
+                        headerShown: false,
+                        useNativeDriver: false
                     }}
-                    initialRouteName="Home">
-                    <Stack.Screen name="Home" component={HomeComp}/>
+                    initialRouteName="Setup">
+                    <Stack.Screen name="Setup" component={Setup}/>
+                    <Stack.Screen name="ID" component={GetID}/>
+                    <Stack.Screen name="Home"  component={HomeComp}/>
                     <Stack.Screen name="Scanner" component={Scanner}/>
                     <Stack.Screen name="Keypad" component={Keypad}/>
                     <Stack.Screen name="Send" component={SendComp}/>
@@ -738,6 +684,35 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontFamily: 'Sora-Regular',
         color: '#aaacae'
+    },
+
+    enabledButton: {
+        flex: 1,
+        backgroundColor: primaryColor,
+        borderRadius: '100%',
+        paddingVertical: 10
+    },
+
+    enabledText: {
+        fontFamily: 'Sora-SemiBold',
+        fontSize: 16,
+        textAlign: 'center',
+        color: 'white'
+    },
+
+    disabledButton: {
+        flex: 1,
+        borderColor: primaryColor,
+        borderWidth: 1,
+        borderRadius: '100%',
+        paddingVertical: 10
+    },
+
+    disabledText: {
+        fontFamily: 'Sora-SemiBold',
+        fontSize: 16,
+        textAlign: 'center',
+        color: primaryColor
     }
 
 

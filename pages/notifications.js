@@ -1,4 +1,4 @@
-import {StyleSheet, Text, View} from "react-native";
+import {AppLoading, StyleSheet, Text, View} from "react-native";
 
 import { TailwindProvider } from "tailwindcss-react-native";
 
@@ -9,244 +9,40 @@ import * as Haptics from "expo-haptics";
 import * as React from "react";
 import { SafeAreaView } from "react-navigation";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import {useFonts} from "expo-font";
+import {TransactionList} from "../components/TransactionList";
 
 
 
 
 export function Notifications() {
 
+  let fontLoaded = useFonts({
+    "Sora-Regular": require("../assets/fonts/Sora-Regular.ttf"),
+    "Sora-SemiBold": require("../assets/fonts/Sora-SemiBold.ttf"),
+  });
+
+  if(!fontLoaded){
+    return <AppLoading/>
+  }
+  else
+
   return (
     <TailwindProvider>
     <View>
       <SafeAreaView style={styles.body}>
         <View>
-            <Text style={{fontFamily: 'Sora-SemiBold', fontSize: 24}}>Activity</Text>
+            <Text style={{fontFamily: 'Sora-SemiBold', fontSize: 24, marginBottom: 20}}>Activity</Text>
         </View>
-        <View style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginTop: 20
-        }}>
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <View style={{
-              height: 50,
-              width: 50,
-              backgroundColor: 'white',
-              borderRadius: '100%',
-              flexDirection: 'row',
-              justifyContent: 'center',
-              alignItems: 'center'
-            }}>
-              <Ionicons size={40} name={'person-circle-outline'}></Ionicons>
-            </View>
-            <View style={{marginLeft: 10}}>
-              <Text style={{fontFamily: 'Sora-SemiBold'}}>Cammie Boas</Text>
-              <Text style={{color: '#aaacae', fontFamily: 'Sora-Regular'}}>April 1
-                </Text>
-            </View>
-          </View>
-          <Text style={{color: 'red'}}>-$2.00</Text>
+        <TransactionList info={"Monday, 15 January"} change={"+$13.00"} name={"Samuel Longley"}/>
+        <TransactionList info={"Monday, 15 January"} change={"+$13.00"} name={"Samuel Longley"}/>
+        <TransactionList info={"Monday, 15 January"} change={"+$13.00"} name={"Samuel Longley"}/>
+        <TransactionList info={"Monday, 15 January"} change={"+$13.00"} name={"Samuel Longley"}/>
+        <TransactionList info={"Monday, 15 January"} change={"+$13.00"} name={"Samuel Longley"}/>
+        <TransactionList info={"Monday, 15 January"} change={"+$13.00"} name={"Samuel Longley"}/>
+        <TransactionList info={"Monday, 15 January"} change={"+$13.00"} name={"Samuel Longley"}/>
+        <TransactionList info={"Monday, 15 January"} change={"+$13.00"} name={"Samuel Longley"}/>
 
-
-        </View>
-        <View style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginTop: 20
-        }}>
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <View style={{
-              height: 50,
-              width: 50,
-              backgroundColor: 'white',
-              borderRadius: '100%',
-              flexDirection: 'row',
-              justifyContent: 'center',
-              alignItems: 'center'
-            }}>
-              <Ionicons size={40} name={'person-circle-outline'}></Ionicons>
-            </View>
-            <View style={{marginLeft: 10}}>
-              <Text style={{fontFamily: 'Sora-SemiBold'}}>Samuel Longley</Text>
-              <Text style={{color: '#aaacae'}}>March 30</Text>
-            </View>
-          </View>
-          <Text style={{color: 'green'}}>+$13.00</Text>
-
-
-        </View>
-        <View style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginTop: 20
-        }}>
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <View style={{
-              height: 50,
-              width: 50,
-              backgroundColor: 'white',
-              borderRadius: '100%',
-              flexDirection: 'row',
-              justifyContent: 'center',
-              alignItems: 'center'
-            }}>
-              <Ionicons size={40} name={'person-circle-outline'}></Ionicons>
-            </View>
-            <View style={{marginLeft: 10}}>
-              <Text style={{fontFamily: 'Sora-SemiBold'}}>Alicia David</Text>
-              <Text style={{color: '#aaacae', fontFamily: 'Sora-Regular'}}>March
-                15</Text>
-            </View>
-          </View>
-          <Text style={{color: 'red'}}>+$12.00</Text>
-
-
-        </View>
-        <View style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginTop: 20
-        }}>
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <View style={{
-              height: 50,
-              width: 50,
-              backgroundColor: 'white',
-              borderRadius: '100%',
-              flexDirection: 'row',
-              justifyContent: 'center',
-              alignItems: 'center'
-            }}>
-              <Ionicons size={40} name={'person-circle-outline'}></Ionicons>
-            </View>
-            <View style={{marginLeft: 10}}>
-              <Text style={{fontFamily: 'Sora-SemiBold'}}>Danyal Thomson
-              </Text>
-              <Text style={{color: '#aaacae'}}>March 11</Text>
-            </View>
-          </View>
-          <Text style={{color: 'green'}}>-$4.00</Text>
-
-
-        </View>
-        <View style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginTop: 20
-        }}>
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <View style={{
-              height: 50,
-              width: 50,
-              backgroundColor: 'white',
-              borderRadius: '100%',
-              flexDirection: 'row',
-              justifyContent: 'center',
-              alignItems: 'center'
-            }}>
-              <Ionicons size={40} name={'person-circle-outline'}></Ionicons>
-            </View>
-            <View style={{marginLeft: 10}}>
-              <Text style={{fontFamily: 'Sora-SemiBold'}}>Eddie Haley
-              </Text>
-              <Text style={{color: '#aaacae', fontFamily: 'Sora-Regular'}}>March
-                10</Text>
-            </View>
-          </View>
-          <Text style={{color: 'red'}}>-$1.50</Text>
-
-
-        </View>
-        <View style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginTop: 20
-        }}>
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <View style={{
-              height: 50,
-              width: 50,
-              backgroundColor: 'white',
-              borderRadius: '100%',
-              flexDirection: 'row',
-              justifyContent: 'center',
-              alignItems: 'center'
-            }}>
-              <Ionicons size={40} name={'person-circle-outline'}></Ionicons>
-            </View>
-            <View style={{marginLeft: 10}}>
-              <Text style={{fontFamily: 'Sora-SemiBold'}}>Jade Farley
-              </Text>
-              <Text style={{color: '#aaacae'}}>Feb 20</Text>
-            </View>
-          </View>
-          <Text style={{color: 'green'}}>+$8.35</Text>
-
-
-        </View>
-        <View style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginTop: 20
-        }}>
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <View style={{
-              height: 50,
-              width: 50,
-              backgroundColor: 'white',
-              borderRadius: '100%',
-              flexDirection: 'row',
-              justifyContent: 'center',
-              alignItems: 'center'
-            }}>
-              <Ionicons size={40} name={'person-circle-outline'}></Ionicons>
-            </View>
-            <View style={{marginLeft: 10}}>
-              <Text style={{fontFamily: 'Sora-SemiBold'}}>Malik Cohen
-              </Text>
-              <Text style={{color: '#aaacae', fontFamily: 'Sora-Regular'}}>Feb
-                10</Text>
-            </View>
-          </View>
-          <Text style={{color: 'red'}}>-$6.00</Text>
-
-
-        </View>
-        <View style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginTop: 20
-        }}>
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <View style={{
-              height: 50,
-              width: 50,
-              backgroundColor: 'white',
-              borderRadius: '100%',
-              flexDirection: 'row',
-              justifyContent: 'center',
-              alignItems: 'center'
-            }}>
-              <Ionicons size={40} name={'person-circle-outline'}></Ionicons>
-            </View>
-            <View style={{marginLeft: 10}}>
-              <Text style={{fontFamily: 'Sora-SemiBold'}}>Virginia Maddox
-              </Text>
-              <Text style={{color: '#aaacae'}}>Jan 3</Text>
-            </View>
-          </View>
-          <Text style={{color: 'green'}}>+$32.70</Text>
-
-
-        </View>
 
       </SafeAreaView>
 
