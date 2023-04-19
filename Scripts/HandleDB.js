@@ -1,6 +1,19 @@
-import { initializeApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
-import { collection, addDoc, getDoc, doc, setDoc, updateDoc, arrayUnion } from "firebase/firestore";
+import {initializeApp} from 'firebase/app';
+import {
+    arrayUnion,
+    collection,
+    doc,
+    getDoc,
+    getDocs,
+    getFirestore,
+    serverTimestamp,
+    setDoc,
+    updateDoc,
+    deleteDoc,
+    query,
+    orderBy,
+    limit
+} from 'firebase/firestore';
 
 // Initialize Firebase
 const firebaseConfig = {
@@ -18,33 +31,116 @@ const db = getFirestore()
 
 const usersRef = collection(db, "users");
 
+async function createRequest(from, to, amount, type, message, transactionID){
+    const docRef = collection(db, "users", to, "requests");
+    await setDoc(doc(docRef), {
+        date: serverTimestamp(),
+        amount: amount,
+        from: from,
+        type: type,
+        message: message,
+        transactionID: transactionID,
+
+    });
+}
+
+async function getSingleRequest(id, docID){
+    return await getDoc(doc(db, "users", id, "requests", docID));
+}
+
+async function acceptRequest(from, to, amount, type, docID, reqID){
+    await addTransaction(to, amount, to, type, true, from, 1)
+    await changeTransactionStatus(from, docID, 1)
+    await deleteDoc(doc(db, "users", to, "requests", reqID));
+
+}
+
+async function deleteRequest(from, to, amount, type, docID, reqID){
+    await addTransaction(to, amount, to, type, true, from, 2)
+    await changeTransactionStatus(from, docID, 1)
+    await deleteDoc(doc(db, "users", to, "requests", reqID));
+
+}
+
+async function getRequest(id){
+    return await getDocs(query((collection(db, "users", id, "requests")), orderBy('date', 'asc')))
+}
+
+async function addTransaction(id, price, to, type, recieved, from, status){
+    //Payment Type
+    // 0 - DuckBills
+    // 1 - Dining Dollars
+    // 2 - Meal Swipes
+
+    // Status
+    // 0 - Pending
+    // 1 - Accepted
+    // 2 - Rejected
+
+    const collRef = collection(db, "users", id, "transactions");
+
+    const docRef = doc(collRef);
+
+    await setDoc(docRef, {
+        date: serverTimestamp(),
+        price: price,
+        to: to,
+        type: type,
+        recieved: recieved,
+        from: from,
+        status: status
+    })
+
+    return docRef.id
+
+}
+
+async function getTransactions(id){
+    return await getDocs(query((collection(db, "users", id, "transactions")), orderBy('date', 'desc')))
+}
+
+async function getTransaction(id, docID){
+
+    return await getDoc(doc(db, "users", id, "transactions", docID));
+
+}
+
+async function deleteTransaction(id, docID){
+    await deleteDoc(doc(db, "users", id, "transactions", docID));
+}
+
+async function changeTransactionStatus(id, docID, status){
+    await updateDoc(doc(db, "users", id, "transactions", docID), {
+        status: status
+    });
+}
+
+async function setQuickPay(id){
+
+    const docRef = collection(db, "users", id, "quickpay");
+
+    if((await getQuickPay(id)).size < 4){
+        await setDoc(doc(docRef), {id: id});
+    }
+
+
+}
+
+async function getQuickPay(id){
+    return await getDocs(collection(db, "users", id, "quickpay"));
+}
 
 async function activeUser(id){
 
     const docRef = doc(db, "users", id);
     const docSnap = await getDoc(docRef);
 
-    if (docSnap.exists()) {
-        console.log("Document data:", docSnap.data());
-    } else {
-        // docSnap.data() will be undefined in this case
-        console.log("No such document!");
-    }
+
 
 }
 
 async function getFriends(id){
-
-    const docRef = doc(db, "users", "20011188");
-    const docSnap = await getDoc(docRef);
-
-    if (docSnap.exists()) {
-        console.log("Document data:", docSnap.data().friends);
-    } else {
-        // docSnap.data() will be undefined in this case
-        console.log("No such document!");
-    }
-
+    return await getDoc(doc(db, "users", id));
 }
 
 async function addFriend(id){
@@ -64,17 +160,8 @@ async function createUser(id, name){
 
 async function getUser(id) {
 
-
-// Add a new document with a generated id.
-
     const docRef = doc(db, "users",  id);
-    const docSnap = await getDoc(docRef);
 
-    if (docSnap.exists()) {
-        return docSnap.data();
-    } else {
-        // docSnap.data() will be undefined in this case
-        console.log("No such document!");
-    }
+    return (await getDoc(docRef)).data().name.toString()
 }
-export {getUser, addFriend};
+export {getSingleRequest, changeTransactionStatus, getTransaction, deleteTransaction, getUser, addFriend, addTransaction, getTransactions, setQuickPay, getQuickPay, getFriends, createRequest, getRequest, acceptRequest, deleteRequest};

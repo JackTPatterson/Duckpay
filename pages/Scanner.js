@@ -3,11 +3,8 @@ import {Text, View, StyleSheet, Button, TouchableOpacity, AppLoading, Dimensions
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import Ionicons from "react-native-vector-icons/Ionicons";
 import {Keypad} from "./keypad";
-import {createStackNavigator} from '@react-navigation/stack';
 import * as Haptics from "expo-haptics";
-import {useFonts} from "expo-font";
 import Svg, {Path} from "react-native-svg";
-import Torch from "react-native-torch/index";
 import { Camera, CameraType } from 'expo-camera';
 import primaryColor from "../Constants";
 

@@ -1,5 +1,5 @@
 
-import {StyleSheet, Text, Image, TouchableOpacity, View, AppLoading} from "react-native";
+import {StyleSheet, Text, Image, TouchableOpacity, View} from "react-native";
 
 
 import Ionicons from "react-native-vector-icons/Ionicons";
@@ -7,6 +7,7 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import * as React from "react";
 import Svg, {Path} from "react-native-svg";
 import {useFonts} from "expo-font";
+import primaryColor from "../Constants";
 
 
 //export function Profile() {
@@ -19,7 +20,7 @@ export function Profile() {
     });
 
     if(!fontLoaded){
-        return <AppLoading/>
+        return <></>
     }
     else
     return (
@@ -27,10 +28,34 @@ export function Profile() {
             <View style={styles.header}>
                 <View
                     style={styles.headerContent}>
-                    <Image
-                        style={styles.avatar}
-                        source={{uri: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'}}
-                    />
+                    <View style={{flexDirection: 'column', alignItems: 'center'}}>
+                        <View style={{
+                            marginBottom: 10,
+                            backgroundColor: 'white',
+                            borderRadius: '100%',
+                            flexDirection: 'column',
+                        }}>
+                            <View
+                                style={{
+                                    width: 100,
+                                    height: 100,
+                                    borderRadius: '100%',
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    backgroundColor: primaryColor,
+
+
+                                }}
+                            >
+                                <Text style={{
+                                    fontFamily: "Sora-SemiBold",
+                                    fontSize: 36,
+                                    color: "white",
+                                }}>JP</Text>
+                            </View>
+                        </View>
+
+                    </View>
                     <Text style={styles.name}>Jack Patterson</Text>
                     <Text style={styles.email}>fakeemail@gmail.com</Text>
                 </View>

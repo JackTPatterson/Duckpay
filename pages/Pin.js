@@ -20,7 +20,7 @@ import Svg, {Path} from "react-native-svg";
 import primaryColor from "../Constants";
 import {addFriend, addTransaction, getQuickPay, createRequest, getUser} from '../Scripts/HandleDB';
 
-export const Keypad = ({navigation, route}) => {
+export const Pin = ({navigation, route}) => {
 
     const [digit, setKey] = useState("");
 
@@ -57,7 +57,7 @@ export const Keypad = ({navigation, route}) => {
     function handleInput(digitVal){
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         if (!digit.includes(".")) {
-                setKey((digit) => digit + digitVal);
+            setKey((digit) => digit + digitVal);
         }
         if(digit.includes(".") && digit.split(".")[1].length < 2 && digitVal !== ".") {
             setKey((digit) => digit + digitVal);
@@ -84,143 +84,93 @@ export const Keypad = ({navigation, route}) => {
                                 marginBottom: 20,
                             }}>
                             <TouchableOpacity onPress={()=>{
-                                navigation.popToTop();
+                                navigation.pop();
                                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                             }}>
                                 <Ionicons name={"chevron-back-outline"} size={30}/>
                             </TouchableOpacity>
-                            <Text style={{fontFamily: 'Sora-SemiBold', fontSize: 20}}>Transfer</Text>
+                            <Text style={{fontFamily: 'Sora-SemiBold', fontSize: 24}}>Send To {name}</Text>
                             <TouchableOpacity onPress={()=>{
-                                // addFriend("20011199")
+                                addFriend("20011199")
                                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                             }}>
-                                <View
-                                    style={{
-                                        width: 50,
-                                        height: 50,
-                                        borderRadius: '100%',
-                                        justifyContent: "center",
-                                        alignItems: "center",
-                                        backgroundColor: primaryColor,
-                                    }}
-                                >
-                                    {name !== null ?
-                                    <Text style={{
-                                        fontFamily: "Sora-SemiBold",
-                                        fontSize: 16,
-                                        color: "white",
-                                    }}>{ name.split(" ")[0].slice(0, 1)}{name.split(" ")[1].slice(0, 1)}</Text>
-                                        : <></>
-                                    }
-                                </View>
+                                <Svg width="30" height="30" viewBox="0 0 24 24" fill={true ? primaryColor : "none"} xmlns="http://www.w3.org/2000/svg">
+                                    <Path d="M12.62 20.8101C12.28 20.9301 11.72 20.9301 11.38 20.8101C8.48 19.8201 2 15.6901 2 8.6901C2 5.6001 4.49 3.1001 7.56 3.1001C9.38 3.1001 10.99 3.9801 12 5.3401C13.01 3.9801 14.63 3.1001 16.44 3.1001C19.51 3.1001 22 5.6001 22 8.6901C22 15.6901 15.52 19.8201 12.62 20.8101Z" stroke={true ? primaryColor : "black"} strokeWidth={2} stroke-linecap="round" stroke-linejoin="round"/>
+                                </Svg>
                             </TouchableOpacity>
 
 
 
                         </View>
-                        <View>
+                        <View style={{flexDirection: "row", gap: 10, justifyContent: 'space-between'}}>
                             <TouchableOpacity onPress={() => {
                                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                                 panelRef2.current.togglePanel();
                             }} style={{
-                                borderRadius: 15,
-                                flexDirection: 'row',
-                                justifyContent: 'space-between',
-                                alignItems: 'center'
-                            }}>
-                            </TouchableOpacity>
-
-                            <TouchableOpacity onPress={() => {
-                                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                                panelRef2.current.togglePanel();
-                            }} style={{
-                                borderRadius: 15,
-                                paddingBottom: 16,
-                                flexDirection: 'row',
-                                justifyContent: 'space-between',
-                                alignItems: 'center'
-                            }}>
-                                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                                    <View
-                                        style={{ padding: 15,
-                                        backgroundColor: '#f9f9f9',
-                                        borderRadius: 50,
-                                        marginRight: 10
-                                    }}>
-                                        <Ionicons name={"card-outline"} size={26}/>
-                                    </View>
-
-                                    <Text style={{marginLeft: 10, fontFamily: 'Sora-SemiBold'}}>
-                                        DuckBills
-                                    </Text>
-                                </View>
-                                <Ionicons name={"chevron-forward"} size={26}/>
-
-
-                            </TouchableOpacity>
-                            <TouchableOpacity onPress={() => {
-                                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                                navigation.push("Message", {data: route.params.data})
-
-
-                            }} style={{
+                                marginTop: 20,
                                 borderRadius: 15,
                                 borderColor: '#f1f1f1',
+                                borderWidth: 1,
+                                flex: 1,
+                                paddingVertical: 16,
+                                paddingHorizontal: 24,
                                 flexDirection: 'row',
                                 justifyContent: 'space-between',
                                 alignItems: 'center'
                             }}>
                                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                                    <View
-                                        style={{ padding: 15,
-                                            backgroundColor: '#f9f9f9',
-                                            borderRadius: 50,
-                                            marginRight: 10
-                                        }}>
-                                        <Ionicons name={"chatbubble-outline"} size={26}/>
-                                    </View>
-                                    <Text style={{marginLeft: 10, fontFamily: 'Sora-SemiBold'}}>
-                                        Message
-                                    </Text>
+                                    <Ionicons name={"card-outline"} size={26}/>
                                 </View>
-                                <View style={{
-                                    flexDirection: 'row',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center'
-                                }}>
-                                    <Text style={{marginRight: 10, fontFamily: 'Sora-SemiBold'}}>
-                                        {
-                                            route.params.message !== undefined ?
-                                            (route.params.message.length > 10 ? route.params.message.substring(0, 10) + "..." : route.params.message)
-                                                : ""
-                                        }
-                                    </Text>
-                                    <Ionicons name={"chevron-forward"} size={26}/>
-
-                                </View>
+                                <Text style={{marginLeft: 10, fontWeight: 500, fontFamily: 'Sora-SemiBold'}}>
+                                    DuckBills
+                                </Text>
 
                             </TouchableOpacity>
-                            <View style={{height: 1, borderColor: '#f1f1f1', width: '100%', position: 'relative', borderWidth: .2, marginTop: 10}}>
-                        </View>
+                            <TouchableOpacity onPress={() => {
+                                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                                panelRef2.current.togglePanel();
+
+
+                            }} style={{
+                                marginTop: 20,
+                                borderRadius: 15,
+                                borderColor: '#f1f1f1',
+                                borderWidth: 1,
+                                flex: 1,
+                                paddingVertical: 16,
+                                paddingHorizontal: 24,
+                                flexDirection: 'row',
+                                justifyContent: 'space-between',
+                                alignItems: 'center'
+                            }}>
+                                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                                    <Ionicons name={"chatbubble-outline"} size={26}/>
+                                </View>
+                                <Text style={{marginLeft: 10, fontWeight: 500, fontFamily: 'Sora-SemiBold'}}>
+                                    Message
+                                </Text>
+
+                            </TouchableOpacity>
                         </View>
 
                     </View>
                     <View>
-                        <View style={ (digit.length === 0) ? {flexDirection: 'row', marginTop: 0, justifyContent: 'space-between', alignItems: 'start'} : {flexDirection: 'row', marginBottom: 0, justifyContent: 'space-between', alignItems: 'start'}}>
+                        <View style={ (digit.length == 0) ? {flexDirection: 'row', marginBottom: 36, justifyContent: 'space-between', alignItems: 'start'} : {flexDirection: 'row', marginBottom: 0, justifyContent: 'space-between', alignItems: 'start'}}>
                             <View
                                 style={{
-
+                                    width: 70,
+                                    height: 70,
                                     borderRadius: '100%',
                                     justifyContent: "center",
                                     alignItems: "center",
-
+                                    backgroundColor: primaryColor,
 
                                 }}
                             >
                                 <Text style={{
-                                    fontFamily: "Sora-Bold",
-                                    fontSize: 56,
-                                    color: "black",
+                                    fontFamily: "Sora-Regular",
+                                    fontSize: 30,
+                                    color: "white",
                                 }}>$</Text>
                             </View>
 
@@ -229,8 +179,7 @@ export const Keypad = ({navigation, route}) => {
                                 textSize={56}
                                 duration={300}
                                 style={{
-                                    marginBottom: 0,
-                                    marginTop: 0,
+                                    marginBottom: 50,
                                     flexDirection: "row",
                                     justifyContent: "center",
                                 }}
@@ -442,7 +391,7 @@ export const Keypad = ({navigation, route}) => {
                                 <TouchableOpacity
                                     onPress={() => {
                                         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                                            setKey((digit) => digit.slice(0, -1))
+                                        setKey((digit) => digit.slice(0, -1))
                                     }}
                                     style={{
                                         width: 70,
@@ -461,7 +410,7 @@ export const Keypad = ({navigation, route}) => {
 
                                 </TouchableOpacity>
                             </View>
-                            {digit.length === 0 || route.params.message === undefined ?
+                            {digit.length === 0 ?
                                 <TouchableOpacity disabled style={{
                                     width: '100%',
                                     borderColor: '#f1f1f1',
@@ -615,15 +564,15 @@ export const Keypad = ({navigation, route}) => {
                         ref={(ref) => (panelRef2.current = ref)}
                     >
                         <View style={{flexDirection: "row", width: '100%', alignItems: 'center', marginBottom: 30, justifyContent: 'space-between'}}>
-                        <Text style={{
-                            fontSize: 24,
-                            fontFamily: 'Sora-SemiBold',
-                            textAlign: 'center'
-                        }}>Change Payment Method</Text>
-                        <TouchableOpacity onPress={()=>panelRef2.current.togglePanel()}>
-                            <Ionicons name={"close-circle-outline"} size={35}/>
-                        </TouchableOpacity>
-            </View>
+                            <Text style={{
+                                fontSize: 24,
+                                fontFamily: 'Sora-SemiBold',
+                                textAlign: 'center'
+                            }}>Change Payment Method</Text>
+                            <TouchableOpacity onPress={()=>panelRef2.current.togglePanel()}>
+                                <Ionicons name={"close-circle-outline"} size={35}/>
+                            </TouchableOpacity>
+                        </View>
 
                         <TouchableOpacity onPress={() => {
                             panelRef2.current.togglePanel();
@@ -659,7 +608,7 @@ export const Keypad = ({navigation, route}) => {
                         onOpen={()=> {
                             addTransaction("20011188", digit, route.params.data, 0, false, "20011188", 0).then(
                                 (res)=> {
-                                    createRequest("20011188", "20011188", digit, 0, route.params.message, res).then(
+                                    createRequest("20011188", "20011188", digit, 0, "Test message", res).then(
                                         ()=> animation2.current?.play()
                                     )
                                 }
@@ -686,16 +635,16 @@ export const Keypad = ({navigation, route}) => {
                             <View>
                                 <View style={{flexDirection: 'column', justifyContent: 'center', alignItems: "center"}}>
 
-                                        <LottieView
-                                            ref={animation2}
+                                    <LottieView
+                                        ref={animation2}
                                         style={{
-                                        width: 150,
-                                        height: 150
-                                    }}
+                                            width: 150,
+                                            height: 150
+                                        }}
                                         speed={.9}
                                         loop={false}
                                         source={require('../assets/complete.json')}
-                                        />
+                                    />
 
                                     <Text style={{
                                         fontSize: 20,

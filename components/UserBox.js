@@ -1,10 +1,26 @@
 import {Text, TouchableOpacity, View} from "react-native";
 import * as React from "react";
 import primaryColor from "../Constants";
+import {getUser} from "../Scripts/HandleDB";
+import {useEffect, useState} from "react";
 export function UserBox(props){
 
-    const firstLetter = props.name.split(" ")[0].slice(0, 1);
-    const lastLetter = props.name.split(" ")[1].slice(0, 1);
+    const [name, setname] = useState(null);
+
+    useEffect(()=>{
+        getUser(props.name).then(res=>{
+            setname(res);
+        })
+    })
+
+    let firstLetter = name;
+    let lastLetter = ""
+
+    try{
+        firstLetter = name.split(" ")[0].slice(0, 1);
+        lastLetter = name.split(" ")[1].slice(0, 1);
+    }
+    catch{}
 
     return (
         <TouchableOpacity onPress={()=>{
@@ -41,9 +57,9 @@ export function UserBox(props){
                         }}>{firstLetter}{lastLetter}</Text>
                     </View>
                 </View>
-                <View>
-                    <Text style={{fontFamily: 'Sora-SemiBold'}}>{props.name.split(" ")[0]}</Text>
-                    <Text style={{fontFamily: 'Sora-SemiBold'}}>{props.name.split(" ")[1]}</Text>
+                <View style={{}}>
+                    <Text style={{fontFamily: 'Sora-SemiBold', textAlign: 'center'}}>{name != null ? name.split(" ")[0] : ""}</Text>
+                    <Text style={{fontFamily: 'Sora-SemiBold', textAlign: 'center'}}>{name != null ? name.split(" ")[1] : ""}</Text>
 
                 </View>
             </View>

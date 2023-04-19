@@ -17,6 +17,7 @@
     "@react-navigation/native": "^6.1.6",
     "@react-navigation/stack": "^6.3.16",
     "expo": "^48.0.9",
+    "expo-application": "~5.1.1",
     "expo-auth-session": "~4.0.3",
     "expo-barcode-scanner": "^12.3.2",
     "expo-camera": "~13.2.1",
@@ -51,13 +52,13 @@
     "react-native-screens": "~3.20.0",
     "react-native-simple-bottom-sheet": "^1.0.4",
     "react-native-svg": "^13.9.0",
+    "react-native-toast-message": "^2.1.6",
     "react-native-torch": "^1.2.0",
     "react-native-vector-icons": "^9.2.0",
     "react-navigation": "^4.4.4",
     "react-navigation-stack": "^2.10.4",
     "realm": "^11.7.0",
-    "tailwindcss-react-native": "^1.7.10",
-    "expo-application": "~5.1.1"
+    "tailwindcss-react-native": "^1.7.10"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

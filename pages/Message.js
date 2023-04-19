@@ -12,12 +12,14 @@ import Svg, {Path} from "react-native-svg";
 import {useEffect, useState} from "react";
 import {getFriends, getUser} from "../Scripts/HandleDB";
 
-export const SendComp = ({navigation}) => {
+export const Message = ({navigation, route}) => {
 
     const [friends, setFriends] = useState(null);
 
+    const [message, setMessage] = useState(null);
+
     useEffect(()=> {
-            getFriendsList("20011188")
+        getFriendsList("20011188")
 
     })
 
@@ -53,50 +55,24 @@ export const SendComp = ({navigation}) => {
                             marginBottom: 20,
                         }}>
                         <TouchableOpacity onPress={()=>{
-                            navigation.pop();
+                            if(message !== null) {
+                                navigation.push("Keypad", {data: route.params.data, message: message});
+                            }
                             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                         }}>
                             <Ionicons name={"chevron-back-outline"} size={30}/>
                         </TouchableOpacity>
-                        <Text style={{fontFamily: 'Sora-SemiBold', fontSize: 20}}>Send</Text>
+                        <Text style={{fontFamily: 'Sora-SemiBold', fontSize: 20}}>Message</Text>
                         <Ionicons style={{color: 'white'}} name={"arrow-back-outline"} size={36}/>
                     </View>
-                    <View style={{flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#aaacae', borderRadius: 15, paddingHorizontal: 10, paddingVertical: 16}}>
-
-                        <Svg style={{marginRight: 10}} width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <Path d="M11.5 21C16.7467 21 21 16.7467 21 11.5C21 6.25329 16.7467 2 11.5 2C6.25329 2 2 6.25329 2 11.5C2 16.7467 6.25329 21 11.5 21Z" stroke={"#aaacae"} strokeWidth={1.3} stroke-linecap="round" stroke-linejoin="round"/>
-                            <Path d="M22 22L20 20" stroke={"#aaacae"} strokeWidth={1.3} stroke-linecap="round" stroke-linejoin="round"/>
-                        </Svg>
-
-                            <TextInput placeholder="Search Student" style={{fontSize: 15, fontFamily: 'Sora-Regular', width: '88%'}}/>
+                    <View style={{flexDirection: 'row', borderWidth: 1, borderColor: '#aaacae', borderRadius: 15, paddingHorizontal: 10, paddingVertical: 16}}>
+                            <TextInput maxLength={255} onChangeText={(val)=>setMessage(val)} placeholder="Write a Message" style={{fontSize: 15, fontFamily: 'Sora-Regular', width: '100%'}}/>
+                    </View>
+                    <View style={{flexDirection: "row", justifyContent: 'space-between', marginTop: 10}}>
+                        <Text style={{fontFamily: 'Sora-SemiBold', fontSize: 16}}>Characters</Text>
+                        <Text style={{fontFamily: 'Sora-SemiBold', fontSize: 16}}>{message !== null ? message.length : "0"}/255</Text>
                     </View>
 
-                    <View style={{
-                        width: '100%',
-                        borderRadius: 14,
-                        marginTop: 20
-                    }}>
-
-                        <Text style={{
-                            fontSize: 20,
-                            fontFamily: 'Sora-Regular',
-                        }}>Friends</Text>
-                        <View style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                    }}>
-
-                        {friends != null ? (
-                            friends.map(dt => {
-                                    return (<UserBox key={dt.id} navigate={navigation} name={dt}/>)})
-                        ) : (
-                            <Text>Loading</Text>
-                        )}
-
-                    </View>
-
-                    </View>
 
 
 
@@ -104,7 +80,7 @@ export const SendComp = ({navigation}) => {
 
             </View>
 
-    );
+        );
 }
 
 

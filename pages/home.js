@@ -6,7 +6,7 @@ import {
     Dimensions,
     AppLoading,
     Easing,
-    Share,
+    Share, Animated,
 } from "react-native";
 import {
     useFonts,
@@ -29,15 +29,17 @@ import BottomSheet from "react-native-simple-bottom-sheet";
 import {Scanner} from './Scanner';
 import {SendComp} from "./Send";
 import LottieView from "lottie-react-native";
-import NumberTicker from "react-native-number-ticker";
-import {TransactionList} from "../components/TransactionList";
+import NumberTicker from "../components/TextTicker";
+import {TransactionItem} from "../components/TransactionItem";
 import {UserBox} from "../components/UserBox";
-import users from "../Scripts/HandleDB";
-import getFriends from "../Scripts/HandleDB";
-import addFriend from "../Scripts/HandleDB";
-import getUser from "../Scripts/HandleDB";
+import {getQuickPay, getTransactions, getUser, setQuickPay} from "../Scripts/HandleDB";
 import {Setup} from "./Setup";
 import {GetID} from "./GetID";
+import {forFade} from "../Scripts/home/interpolators";
+import {Request} from "./Request";
+import {timeConverter} from "../Scripts/timeconverter";
+import {TransactionDetail} from "./TransactionDetail";
+import {Message} from "./Message";
 
 export function Home() {
 
@@ -51,6 +53,10 @@ export function Home() {
     const [balanceType, changeBalanceType] = useState(0);
 
     const animation = useRef(null);
+
+    const [data, setData] = useState(null);
+
+    const [quickPay, setQuickPay] = useState(null);
 
 
     function handleQR() {
@@ -77,8 +83,36 @@ export function Home() {
     }
     const Stack = createStackNavigator();
 
+
     useEffect(() => {
         getBills();
+        getTransactions("20011188").then(res => {
+            let lst = []
+                res.forEach((data)=> {
+                    if(lst.length <= 3 && data.data().price !== undefined) {
+                        lst.push(data)
+                    }
+                })
+            if(lst.length > 2){
+                setData(lst.splice(2, lst.length))
+            }
+            else{
+                setData(lst)
+            }
+
+        })
+
+        getQuickPay("20011188").then(res => {
+
+            let lst = []
+
+            res.forEach((data) => {
+                    lst.push(data)
+                }
+            )
+            setQuickPay(lst)
+        })
+
     }, [])
 
 
@@ -86,16 +120,18 @@ export function Home() {
     let fontLoaded = useFonts({
         "Sora-Regular": require("../assets/fonts/Sora-Regular.ttf"),
         "Sora-SemiBold": require("../assets/fonts/Sora-SemiBold.ttf"),
+        "Sora-Bold": require("../assets/fonts/Sora-Bold.ttf"),
     });
 
     const HomeComp = ({navigation}) => {
         if(!fontLoaded){
-            return <AppLoading/>
+            return <></>
         }
         else
 
         return (
             <View>
+
                 <SafeAreaView style={styles.body}>
                     <View>
                         <View
@@ -116,17 +152,32 @@ export function Home() {
 
                                 textStyle={{
                                     width: "100%",
-                                    fontFamily: "Sora-SemiBold",
+                                    fontFamily: "Sora-Bold",
                                 }}
                             />
 
                             <View style={{flexDirection: 'row', maxWidth: '100%', gap: 10, marginTop: 20}}>
                                 <TouchableOpacity onPress={() => {
                                     getBills();
+
                                 }
-                                } style={balanceType === 0 ? styles.enabledButton : styles.disabledButton}>
+                                } style={balanceType === 0 ? {
+                                    flex: 1,
+                                    backgroundColor: primaryColor,
+                                    borderRadius: '100%',
+                                    paddingVertical: 10} : {
+                                    flex: 1,
+                                    backgroundColor: 'transparent',
+                                    borderRadius: '100%',
+                                    paddingVertical: 10}}>
                                     <Text
-                                        style={balanceType === 0 ? styles.enabledText : styles.disabledText}>DuckBills</Text>
+                                        style={balanceType === 0 ? {fontFamily: 'Sora-SemiBold',
+                                            fontSize: 16,
+                                            textAlign: 'center',
+                                            color: 'white'} : {fontFamily: 'Sora-SemiBold',
+                                            fontSize: 16,
+                                            textAlign: 'center',
+                                            color: 'black'}}>DuckBills</Text>
                                 </TouchableOpacity>
 
 
@@ -134,17 +185,45 @@ export function Home() {
                                     getDiningDollars();
 
 
-                                }} style={balanceType === 1 ? styles.enabledButton : styles.disabledButton}>
+                                }} style={balanceType === 1 ? {
+                                    flex: 1,
+                                    backgroundColor: primaryColor,
+                                    borderRadius: '100%',
+                                    paddingVertical: 10} : {
+                                    flex: 1,
+                                    backgroundColor: 'transparent',
+                                    borderRadius: '100%',
+                                    paddingVertical: 10}}>
                                     <Text
-                                        style={balanceType === 1 ? styles.enabledText : styles.disabledText}>Dining</Text>
+                                        style={balanceType === 1 ? {fontFamily: 'Sora-SemiBold',
+                                            fontSize: 16,
+                                            textAlign: 'center',
+                                            color: 'white'} : {fontFamily: 'Sora-SemiBold',
+                                            fontSize: 16,
+                                            textAlign: 'center',
+                                            color: 'black'}}>Dining</Text>
                                 </TouchableOpacity>
 
 
                                 <TouchableOpacity onPress={() => {
                                     getSwipes();
-                                }} style={balanceType === 2 ? styles.enabledButton : styles.disabledButton}>
+                                }} style={balanceType === 2 ? {
+                                    flex: 1,
+                                    backgroundColor: primaryColor,
+                                    borderRadius: '100%',
+                                    paddingVertical: 10} : {
+                                    flex: 1,
+                                    backgroundColor: 'transparent',
+                                    borderRadius: '100%',
+                                    paddingVertical: 10}}>
                                     <Text
-                                        style={balanceType === 2 ? styles.enabledText : styles.disabledText}>Swipes</Text>
+                                        style={balanceType === 2 ? {fontFamily: 'Sora-SemiBold',
+                                            fontSize: 16,
+                                            textAlign: 'center',
+                                            color: 'white'} : {fontFamily: 'Sora-SemiBold',
+                                            fontSize: 16,
+                                            textAlign: 'center',
+                                            color: 'black'}}>Swipes</Text>
                                 </TouchableOpacity>
 
                             </View>
@@ -170,6 +249,8 @@ export function Home() {
 
                                     <TouchableOpacity onPress={() => {
                                         navigation.push('Send')
+                                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
                                     }} style={{flexDirection: 'column', justifyContent: 'center',}}>
 
 
@@ -307,18 +388,32 @@ export function Home() {
                                             fontFamily: 'Sora-Regular',
                                         }}>Recent Transactions</Text>
                                     </View>
-                                    <TransactionList info={"Monday, 15 January"} change={"+$13.00"} name={"Samuel Longley"}/>
-                                    <TransactionList info={"Monday, 15 January"} change={"+$13.00"} name={"Samuel Longley"}/>
-                                    <TouchableOpacity onPress={()=> {(getUser("20011188")).then((res => console.log(res)))}}>
-                                        <Text>Test</Text>
-                                    </TouchableOpacity>
+                                    {data != null ? (
+                                        data.map(dt => {
 
+                                            let statusText = "";
+                                            if(dt.data().status === 0){
+                                                statusText = "Pending"
+                                            }
+                                            if(dt.data().status === 1){
+                                                statusText = "Accepted"
+                                            }
+                                            if(dt.data().status === 2){
+                                                statusText = "Rejected"
+                                            }
+
+                                            if(dt.data().price !== undefined)
+                                                return <TransactionItem home docID={dt.id} nav={navigation} status={statusText} info={timeConverter(dt.data().date.seconds)}  change={dt.data().recieved ? "+$" + dt.data().price : "-$" + dt.data().price} name={dt.data().to}/>
+                                        })
+                                    ) : (
+                                        <Text>Loading</Text>
+                                    )}
                                 </View>
                             </View>
                             <View style={{
                                 width: '100%',
                                 borderRadius: 14,
-                                marginTop: 20
+                                marginTop: 10
                             }}>
 
                                 <Text style={{
@@ -330,10 +425,17 @@ export function Home() {
                                 alignItems: 'center',
                             }}>
 
-                                <UserBox navigate={navigation} name={"Samuel Longley"}/>
-                                <UserBox navigate={navigation} name={"Samuel Longley"}/>
-                                <UserBox navigate={navigation} name={"Samuel Longley"}/>
-                                <UserBox navigate={navigation} name={"Samuel Longley"}/>
+
+
+                                {quickPay != null ? (
+                                    quickPay.map(dt => {
+                                        return <UserBox key={dt.id} navigate={navigation} name={dt.data().id}/>
+                                    })
+                                ) : (
+                                    <Text>Loading</Text>
+                                )}
+
+
 
                             </View>
 
@@ -364,15 +466,15 @@ export function Home() {
                                         fontFamily: 'Sora-SemiBold',
                                         textAlign: 'center'
                                     }}>My QR Code</Text>
-                                    <TouchableOpacity onPress={()=>panelRef.current.togglePanel()}>
-                                        <Ionicons name={"close-circle-outline"} size={35}/>
+                                    <TouchableOpacity style={{padding: 3, width: 40, height: 40, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', backgroundColor: "#f1f1f1", borderRadius: 100}} onPress={()=>panelRef.current.togglePanel()}>
+                                        <Ionicons name={"close-outline"} size={27}/>
                                     </TouchableOpacity>
                                 </View>
 
                                 <View style={{flexDirection: 'row', justifyContent: 'center'}}>
                                     <QRCodeStyled
                                         data={'Simple QR Code'}
-                                        style={{backgroundColor: 'white', borderRadius: 20, borderWidth: 1, borderColor: "black"}}
+                                        style={{backgroundColor: 'white', borderRadius: 20}}
                                         padding={20}
                                         pieceSize={12}
                                         innerEyesOptions={{borderRadius: 5}}
@@ -393,8 +495,7 @@ export function Home() {
 
 
                                 }} style={{
-                                    borderWidth: 1,
-                                    borderColor: 'black',
+                                    backgroundColor: "#f1f1f1",
                                     padding: 15,
                                     borderRadius: '100%',
                                     marginTop: 20,
@@ -412,8 +513,7 @@ export function Home() {
                                 </TouchableOpacity>
                                     <TouchableOpacity onPress={ async () => {
                                     }} style={{
-                                        borderWidth: 1,
-                                        borderColor: 'black',
+                                        backgroundColor: "#f1f1f1",
                                         padding: 15,
                                         borderRadius: '100%',
                                         marginTop: 20,
@@ -424,9 +524,6 @@ export function Home() {
                                             <Path d="M16 12.9V17.1C16 20.6 14.6 22 11.1 22H6.9C3.4 22 2 20.6 2 17.1V12.9C2 9.4 3.4 8 6.9 8H11.1C14.6 8 16 9.4 16 12.9Z" stroke={"black"} strokeWidth={2} stroke-linecap="round" stroke-linejoin="round"/>
                                             <Path d="M22 6.9V11.1C22 14.6 20.6 16 17.1 16H16V12.9C16 9.4 14.6 8 11.1 8H8V6.9C8 3.4 9.4 2 12.9 2H17.1C20.6 2 22 3.4 22 6.9Z" stroke={"black"} strokeWidth={2} stroke-linecap="round" stroke-linejoin="round"/>
                                         </Svg>
-
-
-
                                     </TouchableOpacity>
                                 </View>
                             </View>
@@ -465,10 +562,38 @@ export function Home() {
                                 fontFamily: 'Sora-SemiBold',
                                 textAlign: 'center'
                             }}>Deposit</Text>
-                            <TouchableOpacity onPress={()=>panelRef2.current.togglePanel()}>
-                                <Ionicons name={"close-circle-outline"} size={35}/>
+
+                            <TouchableOpacity style={{padding: 3, width: 40, height: 40, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', backgroundColor: "#f1f1f1", borderRadius: 100}} onPress={()=>panelRef2.current.togglePanel()}>
+                                <Ionicons name={"close-outline"} size={27}/>
                             </TouchableOpacity>
                         </View>
+                        <TouchableOpacity onPress={() => {
+                            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                            panelRef2.current.togglePanel();
+
+
+                        }} style={{
+                            marginTop: 20,
+                            borderRadius: 15,
+                            borderColor: 'black',
+                            borderWidth: 1,
+                            paddingVertical: 16,
+                            paddingHorizontal: 24,
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                            alignItems: 'center'
+                        }}>
+                            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                                <Ionicons name={"card-outline"} size={26}/>
+                                <Text style={{marginLeft: 10, fontFamily: 'Sora-Regular'}}>
+                                    Payment Method
+                                </Text>
+                            </View>
+                            <Text style={{marginLeft: 10, fontWeight: 500, fontFamily: 'Sora-SemiBold'}}>
+                                ••••1234
+                            </Text>
+
+                        </TouchableOpacity>
                         <View style={{flexDirection: 'row', gap: 10}}>
                             <TouchableOpacity onPress={() => {
                                 panelRef2.current.togglePanel();
@@ -643,8 +768,11 @@ export function Home() {
 
 
 
+
+
+
         if(!fontLoaded){
-            return <AppLoading/>
+
         }
         else
 
@@ -652,17 +780,24 @@ export function Home() {
 
             <NavigationContainer independent={true}>
                 <Stack.Navigator
+                    lazy={true}
+                    optimizationsEnabled={true}
                     screenOptions={{
                         headerShown: false,
-                        useNativeDriver: false
+                        useNativeDriver: false,
+                        cardStyleInterpolator: forFade,
                     }}
-                    initialRouteName="Setup">
-                    <Stack.Screen name="Setup" component={Setup}/>
+                    initialRouteName="Home">
+                    <Stack.Screen name="Setup"  component={Setup}/>
                     <Stack.Screen name="ID" component={GetID}/>
                     <Stack.Screen name="Home"  component={HomeComp}/>
                     <Stack.Screen name="Scanner" component={Scanner}/>
                     <Stack.Screen name="Keypad" component={Keypad}/>
                     <Stack.Screen name="Send" component={SendComp}/>
+                    <Stack.Screen name="Request" component={Request}/>
+                    <Stack.Screen name="TransactionDetail" component={TransactionDetail}/>
+                    <Stack.Screen name="Message" component={Message}/>
+
 
 
                 </Stack.Navigator>
@@ -681,7 +816,7 @@ const styles = StyleSheet.create({
         paddingBottom: 15,
     },
     title: {
-        fontSize: 20,
+        fontSize: 16,
         fontFamily: 'Sora-Regular',
         color: '#aaacae'
     },
@@ -693,27 +828,6 @@ const styles = StyleSheet.create({
         paddingVertical: 10
     },
 
-    enabledText: {
-        fontFamily: 'Sora-SemiBold',
-        fontSize: 16,
-        textAlign: 'center',
-        color: 'white'
-    },
-
-    disabledButton: {
-        flex: 1,
-        borderColor: primaryColor,
-        borderWidth: 1,
-        borderRadius: '100%',
-        paddingVertical: 10
-    },
-
-    disabledText: {
-        fontFamily: 'Sora-SemiBold',
-        fontSize: 16,
-        textAlign: 'center',
-        color: primaryColor
-    }
 
 
 });
