@@ -4,7 +4,7 @@ import * as Haptics from "expo-haptics";
 import Svg, {Path} from "react-native-svg";
 import BottomSheet from "react-native-simple-bottom-sheet";
 import * as React from "react";
-import {addFriend} from "../Scripts/HandleDB";
+import {addFriend, setQuickPay} from "../Scripts/HandleDB";
 import Toast from "react-native-toast-message";
 
 export function UserBottomSheet(props) {
@@ -28,14 +28,14 @@ export function UserBottomSheet(props) {
                 flexDirection: "row",
                 width: '100%',
                 alignItems: 'center',
-                marginBottom: 30,
+                marginBottom: 20,
                 justifyContent: 'space-between'
             }}>
                 <Text style={{
                     fontSize: 24,
                     fontFamily: 'Sora-SemiBold',
                     textAlign: 'center'
-                }}>User</Text>
+                }}>{props.name}</Text>
 
                 <TouchableOpacity style={{
                     padding: 3,
@@ -64,9 +64,9 @@ export function UserBottomSheet(props) {
             }} style={{
                 borderRadius: 15,
                 borderColor: '#f1f1f1',
-                flexDirection: 'row',
+                flexDirection: 'column',
                 justifyContent: 'space-between',
-                alignItems: 'center',
+                alignItems: 'flex-start',
                 marginBottom: 20
             }}>
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -75,7 +75,7 @@ export function UserBottomSheet(props) {
                             padding: 15,
                             backgroundColor: '#f9f9f9',
                             borderRadius: 50,
-                            marginRight: 10
+                            marginRight: 10,
                         }}>
                         <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <Path
@@ -102,8 +102,45 @@ export function UserBottomSheet(props) {
                         Add Friend
                     </Text>
                 </View>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => {
+                Haptics.selectionAsync()
+                setQuickPay(props.friendID)
+                props.toast.show({
+                    type: 'tomatoToast',
+                    text1: 'Added To Quick Pay'
+                });
+                props.panel.current.togglePanel();
 
 
+
+            }} style={{
+                borderRadius: 15,
+                borderColor: '#f1f1f1',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                alignItems: 'flex-start',
+                marginBottom: 20
+            }}>
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                    <View
+                        style={{
+                            padding: 15,
+                            backgroundColor: '#f9f9f9',
+                            borderRadius: 50,
+                            marginRight: 10
+                        }}>
+                        <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <Path d="M14.5 10.6499H9.5" stroke="black" strokeWidth={2} stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <Path d="M12 8.20996V13.21" stroke="black" strokeWidth={2} stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <Path d="M16.8198 2H7.17982C5.04982 2 3.31982 3.74 3.31982 5.86V19.95C3.31982 21.75 4.60982 22.51 6.18982 21.64L11.0698 18.93C11.5898 18.64 12.4298 18.64 12.9398 18.93L17.8198 21.64C19.3998 22.52 20.6898 21.76 20.6898 19.95V5.86C20.6798 3.74 18.9498 2 16.8198 2Z" stroke="black" strokeWidth={2} stroke-linecap="round" stroke-linejoin="round"/>
+                        </Svg>
+
+                    </View>
+                    <Text style={{marginRight: 10, fontFamily: 'Sora-SemiBold'}}>
+                        Add To Quick Pay
+                    </Text>
+                </View>
             </TouchableOpacity>
         </BottomSheet>
     )

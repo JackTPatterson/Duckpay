@@ -3,7 +3,7 @@ import {
     Text,
     TouchableOpacity,
     View,
-    AppLoading, Dimensions, Easing, Animated,
+    Dimensions, Easing
 
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -21,6 +21,7 @@ import primaryColor from "../Constants";
 import {addFriend, addTransaction, getQuickPay, createRequest, getUser} from '../Scripts/HandleDB';
 import Toast from "react-native-toast-message";
 import {UserBottomSheet} from "../components/UserBottomSheet";
+import {GetType} from "../Scripts/GetType";
 
 export const Keypad = ({navigation, route}) => {
 
@@ -38,12 +39,13 @@ export const Keypad = ({navigation, route}) => {
 
     const [success, setSuccess] = useState(false);
 
+    const [type, setType] = useState(0);
 
-    const [name, setname] = useState(null);
+    const [name, setName] = useState(null);
 
-    useEffect(()=>{
-        getUser(route.params.data).then(res=>{
-            setname(res);
+    useEffect(() => {
+        getUser(route.params.data).then(res => {
+            setName(res);
         })
     })
 
@@ -53,23 +55,20 @@ export const Keypad = ({navigation, route}) => {
     });
 
 
-
-
-    function handleInput(digitVal){
+    function handleInput(digitVal) {
         Haptics.selectionAsync()
-        if (!digit.includes(".")) {
+            if (!digit.includes(".")) {
                 setKey((digit) => digit + digitVal);
-        }
-        if(digit.includes(".") && digit.split(".")[1].length < 2 && digitVal !== ".") {
-            setKey((digit) => digit + digitVal);
-        }
+            }
+            if (digit.includes(".") && digit.split(".")[1].length < 2 && digitVal !== ".") {
+                setKey((digit) => digit + digitVal);
+            }
+
     }
 
 
-
-
     if (!fontLoaded) {
-        return <AppLoading/>
+        return <></>
     } else
         return (
             <View>
@@ -84,14 +83,13 @@ export const Keypad = ({navigation, route}) => {
                                 alignItems: "center",
                                 marginBottom: 20,
                             }}>
-                            <TouchableOpacity onPress={()=>{
+                            <TouchableOpacity onPress={() => {
                                 navigation.popToTop();
                             }}>
                                 <Ionicons name={"chevron-back-outline"} size={30}/>
                             </TouchableOpacity>
                             <Text style={{fontFamily: 'Sora-SemiBold', fontSize: 20}}>Transfer</Text>
-                            <TouchableOpacity onPress={()=>{
-                                // addFriend("20011199")
+                            <TouchableOpacity onPress={() => {
                                 Haptics.selectionAsync()
                                 panelRef4.current?.togglePanel();
                             }}>
@@ -106,16 +104,15 @@ export const Keypad = ({navigation, route}) => {
                                     }}
                                 >
                                     {name !== null ?
-                                    <Text style={{
-                                        fontFamily: "Sora-SemiBold",
-                                        fontSize: 16,
-                                        color: "white",
-                                    }}>{ name.split(" ")[0].slice(0, 1)}{name.split(" ")[1].slice(0, 1)}</Text>
+                                        <Text style={{
+                                            fontFamily: "Sora-SemiBold",
+                                            fontSize: 16,
+                                            color: "white",
+                                        }}>{name.split(" ")[0].slice(0, 1)}{name.split(" ")[1].slice(0, 1)}</Text>
                                         : <></>
                                     }
                                 </View>
                             </TouchableOpacity>
-
 
 
                         </View>
@@ -143,19 +140,29 @@ export const Keypad = ({navigation, route}) => {
                             }}>
                                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
                                     <View
-                                        style={{ padding: 15,
-                                        backgroundColor: '#f9f9f9',
-                                        borderRadius: 50,
-                                        marginRight: 10
-                                    }}>
+                                        style={{
+                                            padding: 15,
+                                            backgroundColor: '#f9f9f9',
+                                            borderRadius: 50,
+                                            marginRight: 10
+                                        }}>
                                         <Ionicons name={"card-outline"} size={26}/>
                                     </View>
 
                                     <Text style={{marginLeft: 10, fontFamily: 'Sora-SemiBold'}}>
-                                        DuckBills
+                                        Payment Type
                                     </Text>
                                 </View>
-                                <Ionicons name={"chevron-forward"} size={26}/>
+
+                                <View style={{
+                                    flexDirection: 'row',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center'
+                                }}>
+                                    <GetType type={type}/>
+                                    <Ionicons name={"chevron-forward"} size={26}/>
+
+                                </View>
 
 
                             </TouchableOpacity>
@@ -173,7 +180,8 @@ export const Keypad = ({navigation, route}) => {
                             }}>
                                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
                                     <View
-                                        style={{ padding: 15,
+                                        style={{
+                                            padding: 15,
                                             backgroundColor: '#f9f9f9',
                                             borderRadius: 50,
                                             marginRight: 10
@@ -189,40 +197,53 @@ export const Keypad = ({navigation, route}) => {
                                     justifyContent: 'space-between',
                                     alignItems: 'center'
                                 }}>
-                                    <Text style={{marginRight: 10, fontFamily: 'Sora-SemiBold'}}>
+                                    <Text style={{marginRight: 10, fontFamily: 'Sora-Regular'}}>
                                         {
                                             route.params.message !== undefined ?
-                                            (route.params.message.length > 10 ? route.params.message.substring(0, 10) + "..." : route.params.message)
+                                                (route.params.message.length > 10 ? route.params.message.substring(0, 10) + "..." : route.params.message)
                                                 : ""
                                         }
                                     </Text>
                                     <Ionicons name={"chevron-forward"} size={26}/>
-
                                 </View>
-
                             </TouchableOpacity>
-                            <View style={{height: 1, borderColor: '#f1f1f1', width: '100%', position: 'relative', borderWidth: .2, marginTop: 10}}>
-                        </View>
+                            <View style={{
+                                height: 1,
+                                borderColor: '#f1f1f1',
+                                width: '100%',
+                                position: 'relative',
+                                borderWidth: .2,
+                                marginTop: 10
+                            }}>
+                            </View>
                         </View>
 
                     </View>
                     <View>
-                        <View style={ (digit.length === 0) ? {flexDirection: 'row', marginTop: 0, justifyContent: 'space-between', alignItems: 'start'} : {flexDirection: 'row', marginBottom: 0, justifyContent: 'space-between', alignItems: 'start'}}>
+                        <View style={(digit.length === 0) ? {
+                            flexDirection: 'row',
+                            marginTop: 0,
+                            justifyContent: 'space-between',
+                            alignItems: 'start'
+                        } : {
+                            flexDirection: 'row',
+                            marginBottom: 0,
+                            justifyContent: 'space-between',
+                            alignItems: 'start'
+                        }}>
                             <View
                                 style={{
 
                                     borderRadius: '100%',
                                     justifyContent: "center",
                                     alignItems: "center",
-
-
                                 }}
                             >
                                 <Text style={{
                                     fontFamily: "Sora-Bold",
                                     fontSize: 56,
                                     color: "black",
-                                }}>$</Text>
+                                }}>{type === 2 ? "" : "$"}</Text>
                             </View>
 
                             <NumberTicker
@@ -240,7 +261,6 @@ export const Keypad = ({navigation, route}) => {
                                 }}
                             />
                         </View>
-
 
 
                         <View style={{flexDirection: "column"}}>
@@ -412,7 +432,7 @@ export const Keypad = ({navigation, route}) => {
                             >
                                 <TouchableOpacity
                                     onPress={() => {
-                                        if(digit.length > 0) {
+                                        if (digit.length > 0) {
                                             handleInput(".");
                                         }
                                     }}
@@ -429,7 +449,7 @@ export const Keypad = ({navigation, route}) => {
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     onPress={() => {
-                                        if(digit.length > 0) {
+                                        if (digit.length > 0) {
                                             handleInput("0");
                                         }
                                     }}
@@ -447,7 +467,7 @@ export const Keypad = ({navigation, route}) => {
                                 <TouchableOpacity
                                     onPress={() => {
                                         Haptics.selectionAsync()
-                                            setKey((digit) => digit.slice(0, -1))
+                                        setKey((digit) => digit.slice(0, -1))
                                     }}
                                     style={{
                                         width: 70,
@@ -458,16 +478,22 @@ export const Keypad = ({navigation, route}) => {
                                         alignItems: "center",
                                     }}
                                 >
-                                    <Svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <Path d="M10.28 20.25H17C19.76 20.25 22 18.01 22 15.25V8.75C22 5.99 19.76 3.75 17 3.75H10.28C8.86999 3.75 7.52999 4.34 6.57999 5.39L3.04999 9.27C1.63999 10.82 1.63999 13.18 3.04999 14.73L6.57999 18.61C7.52999 19.66 8.86999 20.25 10.28 20.25Z" stroke={"black"} strokeWidth={2} stroke-linecap="round" stroke-linejoin="round"/>
-                                        <Path d="M16 14.47L11.06 9.53003" stroke={"black"} strokeWidth={2} stroke-linecap="round"/>
-                                        <Path d="M11.06 14.47L16 9.53003" stroke={"black"} strokeWidth={2} stroke-linecap="round"/>
+                                    <Svg width="30" height="30" viewBox="0 0 24 24" fill="none"
+                                         xmlns="http://www.w3.org/2000/svg">
+                                        <Path
+                                            d="M10.28 20.25H17C19.76 20.25 22 18.01 22 15.25V8.75C22 5.99 19.76 3.75 17 3.75H10.28C8.86999 3.75 7.52999 4.34 6.57999 5.39L3.04999 9.27C1.63999 10.82 1.63999 13.18 3.04999 14.73L6.57999 18.61C7.52999 19.66 8.86999 20.25 10.28 20.25Z"
+                                            stroke={"black"} strokeWidth={2} stroke-linecap="round"
+                                            stroke-linejoin="round"/>
+                                        <Path d="M16 14.47L11.06 9.53003" stroke={"black"} strokeWidth={2}
+                                              stroke-linecap="round"/>
+                                        <Path d="M11.06 14.47L16 9.53003" stroke={"black"} strokeWidth={2}
+                                              stroke-linecap="round"/>
                                     </Svg>
 
                                 </TouchableOpacity>
                             </View>
                             {digit.length === 0 || route.params.message === undefined || (parseInt(digit) < 0.01)
-                             ?
+                                ?
                                 <TouchableOpacity disabled style={{
                                     width: '100%',
                                     borderColor: '#f1f1f1',
@@ -485,19 +511,19 @@ export const Keypad = ({navigation, route}) => {
                                 </TouchableOpacity>
                                 :
                                 <TouchableOpacity onPress={() => {
-                                    if(!digit.includes(".")){
-                                        setKey((digit) => digit + ".");
-                                        setKey((digit) => digit + "0");
-                                        setKey((digit) => digit + "0");
+                                    if(type !== 2) {
+                                        if (!digit.includes(".")) {
+                                            setKey((digit) => digit + ".");
+                                            setKey((digit) => digit + "0");
+                                            setKey((digit) => digit + "0");
 
-                                    }
-                                    else if(digit.split(".")[1].length === 0){
-                                        setKey((digit) => digit + "0");
-                                        setKey((digit) => digit + "0");
+                                        } else if (digit.split(".")[1].length === 0) {
+                                            setKey((digit) => digit + "0");
+                                            setKey((digit) => digit + "0");
 
-                                    }
-                                    else if(digit.split(".")[1].length === 1){
-                                        setKey((digit) => digit + "0");
+                                        } else if (digit.split(".")[1].length === 1) {
+                                            setKey((digit) => digit + "0");
+                                        }
                                     }
                                     panelRef.current.togglePanel();
 
@@ -539,69 +565,98 @@ export const Keypad = ({navigation, route}) => {
                     >
                         <View>
 
-                        <View style={{flexDirection: "row", width: '100%', alignItems: 'center', marginBottom: 30, justifyContent: 'space-between'}}>
+                            <View style={{
+                                flexDirection: "row",
+                                width: '100%',
+                                alignItems: 'center',
+                                marginBottom: 30,
+                                justifyContent: 'space-between'
+                            }}>
+                                <Text style={{
+                                    fontSize: 24,
+                                    fontFamily: 'Sora-SemiBold',
+                                    textAlign: 'center'
+                                }}>Confirm Payment</Text>
+
+
+                                <TouchableOpacity style={{
+                                    padding: 3,
+                                    width: 40,
+                                    height: 40,
+                                    flexDirection: 'row',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    backgroundColor: "#f9f9f9",
+                                    borderRadius: 100
+                                }} onPress={() => panelRef.current.togglePanel()}>
+                                    <Ionicons name={"close-outline"} size={27}/>
+                                </TouchableOpacity>
+                            </View>
+                            <Text
+                                style={{fontSize: 20, fontFamily: 'Sora-Regular', textAlign: 'center', marginTop: 20}}>You
+                                are are about to send</Text>
                             <Text style={{
-                                fontSize: 24,
+                                fontSize: 42,
                                 fontFamily: 'Sora-SemiBold',
-                                textAlign: 'center'
-                            }}>Confirm Payment</Text>
-                            <TouchableOpacity onPress={()=>panelRef.current.togglePanel()}>
-                                <Ionicons name={"close-circle-outline"} size={35}/>
-                            </TouchableOpacity>
-                        </View>
-                        <Text style={{fontSize: 20, fontFamily: 'Sora-Regular', textAlign: 'center', marginTop: 20}}>You are are about to send</Text>
-                        <Text style={{fontSize: 42, fontFamily: 'Sora-SemiBold', textAlign: 'center', marginTop: 20}}>${digit}</Text>
-                        <Text style={{fontSize: 20, fontFamily: 'Sora-Regular', textAlign: 'center', marginVertical: 20}}>to {name}</Text>
-                        <View style={{
-                            flexDirection: 'row',
-                            marginBottom: 20,
-                            justifyContent: 'center',
-                            maxWidth: '100%',
-                            marginTop: 20
-                        }}>
-                            <TouchableOpacity onPress={() => {
-                                panelRef.current.togglePanel();
-                                Haptics.selectionAsync()
-                                navigation.push('Home');
-                            }} style={{
-                                flex:1,
-                                borderWidth: 1,
-                                borderColor: 'black',
-                                padding: 15,
-                                borderRadius: '100%',
-                                marginTop: 10,
-                                marginRight: 10
+                                textAlign: 'center',
+                                marginTop: 20
+                            }}>{type === 2 ? "": "$"}{digit}</Text>
+                            <GetType center type={type}/>
+                            {name !== null ?
+                            <Text style={{
+                                fontSize: 20,
+                                fontFamily: 'Sora-Regular',
+                                textAlign: 'center',
+                                marginVertical: 20
+                            }}> to {name.toString()}</Text> : <></>
+                            }
+                            <View style={{
+                                flexDirection: 'row',
+                                marginBottom: 20,
+                                justifyContent: 'center',
+                                maxWidth: '100%',
+                                marginTop: 20
                             }}>
-                                <Text style={{
-                                    textAlign: "center",
-                                    fontFamily: 'Sora-Regular',
-                                    fontSize: 20,
-                                }}>Cancel</Text>
-                            </TouchableOpacity>
+                                <TouchableOpacity onPress={() => {
+                                    panelRef.current.togglePanel();
+                                    navigation.push('Home');
+                                }} style={{
+                                    flex: 1,
+                                    borderWidth: 1,
+                                    borderColor: 'black',
+                                    padding: 15,
+                                    borderRadius: '100%',
+                                    marginTop: 10,
+                                    marginRight: 10
+                                }}>
+                                    <Text style={{
+                                        textAlign: "center",
+                                        fontFamily: 'Sora-Regular',
+                                        fontSize: 20,
+                                    }}>Cancel</Text>
+                                </TouchableOpacity>
 
-                            <TouchableOpacity onPress={() => {
-                                panelRef.current.togglePanel();
-                                Haptics.selectionAsync()
-                                panelRef3.current.togglePanel();
-
-
-                            }} style={{
-                                flex:1,
-                                borderWidth: 1,
-                                borderColor: primaryColor,
-                                backgroundColor: primaryColor,
-                                padding: 15,
-                                borderRadius: '100%',
-                                marginTop: 10
-                            }}>
-                                <Text style={{
-                                    textAlign: "center",
-                                    fontFamily: 'Sora-Regular',
-                                    fontSize: 20,
-                                    color: 'white'
-                                }}>Confirm</Text>
-                            </TouchableOpacity>
-                        </View>
+                                <TouchableOpacity onPress={() => {
+                                    panelRef.current.togglePanel();
+                                    Haptics.selectionAsync()
+                                    panelRef3.current.togglePanel();
+                                }} style={{
+                                    flex: 1,
+                                    borderWidth: 1,
+                                    borderColor: primaryColor,
+                                    backgroundColor: primaryColor,
+                                    padding: 15,
+                                    borderRadius: '100%',
+                                    marginTop: 10
+                                }}>
+                                    <Text style={{
+                                        textAlign: "center",
+                                        fontFamily: 'Sora-Regular',
+                                        fontSize: 20,
+                                        color: 'white'
+                                    }}>Confirm</Text>
+                                </TouchableOpacity>
+                            </View>
                         </View>
 
 
@@ -619,40 +674,100 @@ export const Keypad = ({navigation, route}) => {
                         }}
                         ref={(ref) => (panelRef2.current = ref)}
                     >
-                        <View style={{flexDirection: "row", width: '100%', alignItems: 'center', marginBottom: 30, justifyContent: 'space-between'}}>
-                        <Text style={{
-                            fontSize: 24,
-                            fontFamily: 'Sora-SemiBold',
-                            textAlign: 'center'
-                        }}>Change Payment Method</Text>
-                        <TouchableOpacity onPress={()=>panelRef2.current.togglePanel()}>
-                            <Ionicons name={"close-circle-outline"} size={35}/>
-                        </TouchableOpacity>
-            </View>
+                        <View style={{
+                            flexDirection: "row",
+                            width: '100%',
+                            alignItems: 'center',
+                            marginBottom: 10,
+                            justifyContent: 'space-between'
+                        }}>
+                            <Text style={{
+                                fontSize: 20,
+                                fontFamily: 'Sora-SemiBold',
+                                textAlign: 'center'
+                            }}>Change Payment</Text>
+                            <TouchableOpacity
+                                TouchableOpacity style={{
+                                padding: 3,
+                                width: 40,
+                                height: 40,
+                                flexDirection: 'row',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                backgroundColor: "#f9f9f9",
+                                borderRadius: 100
+                            }} onPress={() => panelRef2.current.togglePanel()}>
+                                <Ionicons name={"close-outline"} size={27}/>
+                            </TouchableOpacity>
+                        </View>
 
                         <TouchableOpacity onPress={() => {
+                            setType(0);
                             panelRef2.current.togglePanel();
-                            panelRef3.current.togglePanel();
                         }} style={{
                             width: '100%',
                             justifyContent: 'space-between',
+                            backgroundColor: type === 0 ? primaryColor: "white",
                             flexDirection: 'row',
                             alignItems: 'center',
                             paddingHorizontal: 15,
-                            borderColor: 'black',
+                            borderColor: type === 0 ? primaryColor: "black",
                             borderWidth: 1,
                             marginTop: 20,
                             borderRadius: 14,
                             paddingVertical: 20
                         }}>
                             <Text
-                                style={{fontSize: 16, textAlign: 'left', fontFamily: 'Sora-SemiBold',}}>DuckBills</Text>
-                            <Ionicons name={"checkmark-outline"} size={24}/>
+                                style={{fontSize: 16, textAlign: 'left', fontFamily: 'Sora-SemiBold', color: type === 0 ? "white": "black"}}>DuckBills</Text>
+                            {type === 0 ? <Ionicons name={"checkmark-outline"} color={"white"} size={24}/> : <></>}
+
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => {
+                            setType(1);
+                            panelRef2.current.togglePanel();
+                        }} style={{
+                            width: '100%',
+                            justifyContent: 'space-between',
+                            backgroundColor: type === 1 ? primaryColor: "white",
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            paddingHorizontal: 15,
+                            borderColor: type === 1 ? primaryColor: "black",
+                            borderWidth: 1,
+                            marginTop: 20,
+                            borderRadius: 14,
+                            paddingVertical: 20
+                        }}>
+                            <Text
+                                style={{fontSize: 16, textAlign: 'left', fontFamily: 'Sora-SemiBold', color: type === 1 ? "white": "black"}}>Dinning Dollars</Text>
+                            {type === 1 ? <Ionicons name={"checkmark-outline"} color={"white"} size={24}/> : <></>}
+
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => {
+                            setType(2);
+                            panelRef2.current.togglePanel();
+                        }} style={{
+                            width: '100%',
+                            justifyContent: 'space-between',
+                            backgroundColor: type === 2 ? primaryColor: "white",
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            paddingHorizontal: 15,
+                            borderColor: type === 2 ? primaryColor: "black",
+                            borderWidth: 1,
+                            marginTop: 20,
+                            borderRadius: 14,
+                            paddingVertical: 20,
+                            marginBottom: 20,
+
+                        }}>
+                            <Text
+                                style={{fontSize: 16, textAlign: 'left', fontFamily: 'Sora-SemiBold', color: type === 2 ? "white": "black"}}>Swipes</Text>
+                            {type === 2 ? <Ionicons name={"checkmark-outline"} color={"white"} size={24}/> : <></>}
                         </TouchableOpacity>
 
 
                     </BottomSheet>
-
 
 
                     <BottomSheet
@@ -661,17 +776,17 @@ export const Keypad = ({navigation, route}) => {
                         animation={Easing.inOut(Easing.poly(5))}
                         sliderMaxHeight={Dimensions.get('window').height * .8}
                         isOpen={false}
-                        onOpen={()=> {
-                            addTransaction("20011188", digit, route.params.data, 0, false, "20011188", 0).then(
-                                (res)=> {
-                                    createRequest("20011188", "20011188", digit, 0, route.params.message, res).then(
-                                        ()=> animation2.current?.play()
+                        onOpen={() => {
+                            addTransaction("20011188", digit, route.params.data, type, false, "20011188", 0).then(
+                                (res) => {
+                                    createRequest("20011188", "20011188", digit, type, route.params.message, res).then(
+                                        () => animation2.current?.play()
                                     )
                                 }
                             )
                         }}
 
-                        onClose={()=>{
+                        onClose={() => {
                             animation2.current?.reset()
                             animation1.current?.reset()
 
@@ -691,16 +806,16 @@ export const Keypad = ({navigation, route}) => {
                             <View>
                                 <View style={{flexDirection: 'column', justifyContent: 'center', alignItems: "center"}}>
 
-                                        <LottieView
-                                            ref={animation2}
+                                    <LottieView
+                                        ref={animation2}
                                         style={{
-                                        width: 150,
-                                        height: 150
-                                    }}
+                                            width: 150,
+                                            height: 150
+                                        }}
                                         speed={.9}
                                         loop={false}
                                         source={require('../assets/complete.json')}
-                                        />
+                                    />
 
                                     <Text style={{
                                         fontSize: 20,
@@ -709,30 +824,72 @@ export const Keypad = ({navigation, route}) => {
                                         textAlign: 'center'
                                     }}>Payment Sent</Text>
 
-                                    <View style={{flexDirection: 'row', justifyContent: "space-between", marginTop: 30, alignItems: "flex-end", width: "100%"}}>
+                                    <View style={{
+                                        flexDirection: 'row',
+                                        justifyContent: "space-between",
+                                        marginTop: 30,
+                                        alignItems: "flex-end",
+                                        width: "100%"
+                                    }}>
 
-                                        <Text style={{fontFamily: 'Sora-SemiBold', fontSize: 24}}>${digit}</Text>
-                                        <Text style={{fontFamily: 'Sora-Regular', fontSize: 16}}>DuckBills</Text>
+                                        <Text style={{
+                                            fontFamily: 'Sora-SemiBold',
+                                            fontSize: 24
+                                        }}>{type === 2 ? "" : "$"}{digit}</Text>
+
+                                        <GetType type={type}/>
 
                                     </View>
-                                    <View style={{height: 1, borderColor: '#f1f1f1', width: '100%', position: 'relative', borderWidth: .2, marginTop: 10}}>
+                                    <View style={{
+                                        height: 1,
+                                        borderColor: '#f1f1f1',
+                                        width: '100%',
+                                        position: 'relative',
+                                        borderWidth: .2,
+                                        marginTop: 10
+                                    }}>
                                     </View>
-                                    <View style={{flexDirection: 'row', justifyContent: "space-between", marginTop: 30, alignItems: "flex-end", width: "100%"}}>
+                                    <View style={{
+                                        flexDirection: 'row',
+                                        justifyContent: "space-between",
+                                        marginTop: 30,
+                                        alignItems: "flex-end",
+                                        width: "100%"
+                                    }}>
 
-                                        <Text style={{fontFamily: 'Sora-Regular', fontSize: 16, color: 'gray'}}>Recipient</Text>
+                                        <Text style={{
+                                            fontFamily: 'Sora-Regular',
+                                            fontSize: 16,
+                                            color: 'gray'
+                                        }}>Recipient</Text>
                                         <Text style={{fontFamily: 'Sora-Regular', fontSize: 16}}>{name}</Text>
 
                                     </View>
-                                    <View style={{flexDirection: 'row', justifyContent: "space-between", marginTop: 30, alignItems: "flex-end", width: "100%"}}>
+                                    <View style={{
+                                        flexDirection: 'row',
+                                        justifyContent: "space-between",
+                                        marginTop: 30,
+                                        alignItems: "flex-end",
+                                        width: "100%"
+                                    }}>
 
-                                        <Text style={{fontFamily: 'Sora-Regular', fontSize: 16, color: 'gray'}}>Date Transfered</Text>
+                                        <Text style={{fontFamily: 'Sora-Regular', fontSize: 16, color: 'gray'}}>Date
+                                            Transfered</Text>
                                         <Text style={{fontFamily: 'Sora-Regular', fontSize: 16}}>{
                                             new Date(Date.now()).toLocaleString().split(', ')[0]
                                         }</Text>
 
                                     </View>
-                                    <View style={{flexDirection: 'row', justifyContent: "space-between", marginTop: 30, alignItems: "flex-end", width: "100%", paddingBottom: 50}}>
-                                        <Text style={{fontFamily: 'Sora-Regular', fontSize: 16, color: 'gray'}}>Time Transfered</Text>
+                                    <View style={{
+                                        flexDirection: 'row',
+                                        justifyContent: "space-between",
+                                        marginTop: 30,
+                                        alignItems: "flex-end",
+                                        width: "100%",
+                                        paddingBottom: 50
+                                    }}>
+                                        <Text style={{fontFamily: 'Sora-Regular', fontSize: 16, color: 'gray'}}>Time
+                                            Transfered</Text>
                                         <Text style={{fontFamily: 'Sora-Regular', fontSize: 16}}>{
                                             new Date(Date.now()).toLocaleString().split(', ')[1]
 
@@ -768,7 +925,7 @@ export const Keypad = ({navigation, route}) => {
                         </View>
 
                     </BottomSheet>
-                    <UserBottomSheet toast={Toast} friendID={route.params.data} panel={panelRef4}/>
+                    <UserBottomSheet name={name} toast={Toast} friendID={route.params.data} panel={panelRef4}/>
                 </SafeAreaView>
             </View>
         );

@@ -1,6 +1,8 @@
-import {Text, View} from "react-native";
+import {Text, TouchableOpacity, View} from "react-native";
 import * as React from "react";
 import {BaseToast} from "react-native-toast-message";
+import * as Haptics from "expo-haptics";
+import Ionicons from "react-native-vector-icons/Ionicons";
 
 export const toastConfig = {
     /*
@@ -30,8 +32,19 @@ export const toastConfig = {
       They will be passed when calling the `show` method (see below)
     */
     tomatoToast: ({ text1, props }) => (
-        <View style={{ height: 45, width: '90%', borderRadius: 100, marginTop: 20,  backgroundColor: '#f1f1f1', flexDirection: "column", justifyContent: 'center'}}>
+        <View style={{width: '90%', borderRadius: 100, padding: 10, paddingHorizontal: 20, alignItems: 'center', shadowRadius: 20, shadowOffset: {width: 0, height: 10}, shadowColor: "black", shadowOpacity: .2, marginTop: 20,  backgroundColor: 'white', flexDirection: "row", justifyContent: 'space-between'}}>
             <Text style={{fontFamily: 'Sora-SemiBold', textAlign: 'center'}}>{text1}</Text>
+            <View  style={{
+                borderRadius: 100,
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: '#42ff6e',
+                zIndex: 100,
+                padding: 5
+            }}>
+                <Ionicons name={"checkmark-outline"} color={"white"} size={20}/>
+
+            </View>
         </View>
     )
 };

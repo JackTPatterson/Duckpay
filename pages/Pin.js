@@ -479,7 +479,7 @@ export const Pin = ({navigation, route}) => {
                     >
                         <View style={{flexDirection: "row", width: '100%', alignItems: 'center', marginBottom: 30, justifyContent: 'space-between'}}>
                             <Text style={{
-                                fontSize: 24,
+                                fontSize: 20,
                                 fontFamily: 'Sora-SemiBold',
                                 textAlign: 'center'
                             }}>Confirm Payment</Text>
@@ -564,7 +564,7 @@ export const Pin = ({navigation, route}) => {
                     >
                         <View style={{flexDirection: "row", width: '100%', alignItems: 'center', marginBottom: 30, justifyContent: 'space-between'}}>
                             <Text style={{
-                                fontSize: 24,
+                                fontSize: 20,
                                 fontFamily: 'Sora-SemiBold',
                                 textAlign: 'center'
                             }}>Change Payment Method</Text>

@@ -4,6 +4,7 @@ import primaryColor from "../Constants";
 import {acceptRequest, deleteRequest, getUser} from "../Scripts/HandleDB";
 import {useEffect, useState} from "react";
 import * as Haptics from "expo-haptics";
+import {GetRequestType} from "../Scripts/GetType";
 
 function TransactionItem(props){
 
@@ -106,9 +107,19 @@ function RequestItem(props){
     return (
         <TouchableOpacity onPress={() => {
             Haptics.impactAsync(Haptics.selectionAsync());
-            props.data({amount: props.change, fromID: props.from, msg: props.message, docID: props.docID, transactionID: props.transactionID})
-            props.panel.current?.togglePanel();
-            console.log(props.transactionID)
+            if(name !== null) {
+
+                props.data({
+                    amount: props.change,
+                    name: name,
+                    msg: props.message,
+                    docID: props.docID,
+                    transactionID: props.transactionID,
+                    fromID: props.fromID,
+                    type: props.type
+                })
+            }
+                props.panel.current?.togglePanel();
         }
         }
           style={{
@@ -143,7 +154,7 @@ function RequestItem(props){
                         color: "white",
                     }}>{firstLetter}{lastLetter}</Text>
                 </View>
-                <Text style={{fontFamily: 'Sora-SemiBold', fontSize: 16, flex: 1}}>{name} would like to send you duckbills</Text>
+                <GetRequestType type={props.type} name={name}/>
 
 
             </View>
@@ -153,7 +164,7 @@ function RequestItem(props){
                 alignItems: 'center',
             }}>
 
-                <Text style={{fontFamily: 'Sora-SemiBold', textAlign: 'center', fontSize: 24}}>${props.change}</Text>
+                <Text style={{fontFamily: 'Sora-SemiBold', textAlign: 'center', fontSize: 24}}>{props.type === 2 ? "" : "$"}{props.change}</Text>
 
 
                     <View style={{

@@ -12,6 +12,7 @@ import Svg, {Path} from "react-native-svg";
 import {useEffect, useState} from "react";
 import {getTransaction, getUser} from "../Scripts/HandleDB";
 import NumberTicker from "../components/TextTicker";
+import {GetType} from "../Scripts/GetType";
 
 export const TransactionDetail = ({navigation, route}) => {
 
@@ -131,9 +132,11 @@ export const TransactionDetail = ({navigation, route}) => {
 
                         {
                             data !== null ?
-                        <Text style={{fontFamily: 'Sora-SemiBold', fontSize: 24}}>${data.data().price}</Text> : ""
+                        <Text style={{fontFamily: 'Sora-SemiBold', fontSize: 24}}>${data.data().amount}</Text> : ""
                         }
-                        <Text style={{fontFamily: 'Sora-Regular', fontSize: 16}}>DuckBills</Text>
+                        {data !== null ?
+                        <GetType type={data.data().type}/> : <></>
+                        }
 
                     </View>
                     <View style={{height: 1, borderColor: '#f1f1f1', width: '100%', position: 'relative', borderWidth: .2, marginTop: 10}}>
@@ -148,7 +151,7 @@ export const TransactionDetail = ({navigation, route}) => {
                     </View>
                     <View style={{flexDirection: 'row', justifyContent: "space-between", marginTop: 30, alignItems: "flex-end", width: "100%"}}>
 
-                        <Text style={{fontFamily: 'Sora-Regular', fontSize: 16, color: 'gray'}}>Date Transfered</Text>
+                        <Text style={{fontFamily: 'Sora-Regular', fontSize: 16, color: 'gray'}}>Date Transferred</Text>
                         <Text style={{fontFamily: 'Sora-Regular', fontSize: 16}}>
                             {
                                 data !== null ?

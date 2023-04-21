@@ -17,7 +17,7 @@ import {
 } from '../Scripts/HandleDB';
 import * as Haptics from "expo-haptics";
 import * as React from "react";
-import { SafeAreaView } from "react-navigation";
+import {SafeAreaView} from "react-navigation";
 import {useFonts} from "expo-font";
 import {TransactionItem, RequestItem} from "../components/TransactionItem";
 import {useCallback, useEffect, useState} from "react";
@@ -30,6 +30,7 @@ import {createStackNavigator} from "@react-navigation/stack";
 import {forFade} from "../Scripts/home/interpolators";
 import Toast from "react-native-toast-message";
 import {toastConfig} from "../Scripts/toast";
+import {GetType} from "../Scripts/GetType";
 
 export const NotificationsComp = ({navigation}) => {
     const [data, setData] = useState(null)
@@ -41,29 +42,28 @@ export const NotificationsComp = ({navigation}) => {
     const [currentData, setCurrentData] = useState({});
 
 
-    useEffect(()=> {
-        if(request == null){
+    useEffect(() => {
+        if (request == null) {
             getRequestsList("20011188")
         }
-        if(data == null){
+        if (data == null) {
             getTransactionsList("20011188")
         }
     })
 
-    function getTransactionsList(id){
+    function getTransactionsList(id) {
 
         getTransactions(id).then(res => {
             let todayLst = []
             let lst = []
-            res.forEach((data)=> {
-                if(new Date(data.data().date.seconds*1000).toDateString() === new Date().toDateString()){
-                    todayLst.push(data);
-                }
-                else {
-                    if(lst.length < 10) {
-                        lst.push(data);
+            res.forEach((data) => {
+                    if (new Date(data.data().date.seconds * 1000).toDateString() === new Date().toDateString()) {
+                        todayLst.push(data);
+                    } else {
+                        if (lst.length < 10) {
+                            lst.push(data);
+                        }
                     }
-                }
                 }
             )
             setData(lst)
@@ -73,13 +73,10 @@ export const NotificationsComp = ({navigation}) => {
     }
 
 
-
-
-
     function getRequestsList(id) {
         getRequest(id).then(res => {
             let lst = []
-            res.forEach((data)=> {
+            res.forEach((data) => {
                     lst.push(data)
                 }
             )
@@ -101,103 +98,112 @@ export const NotificationsComp = ({navigation}) => {
     }, []);
 
 
+    let fontLoaded = useFonts({
+        "Sora-Regular": require("../assets/fonts/Sora-Regular.ttf"),
+        "Sora-SemiBold": require("../assets/fonts/Sora-SemiBold.ttf"),
+    });
 
+    if (!fontLoaded) {
+        return <></>
+    } else
 
-  let fontLoaded = useFonts({
-    "Sora-Regular": require("../assets/fonts/Sora-Regular.ttf"),
-    "Sora-SemiBold": require("../assets/fonts/Sora-SemiBold.ttf"),
-  });
+        return (
+            <View>
+                <SafeAreaView style={styles.body}>
 
-  if(!fontLoaded){
-    return <></>
-  }
-  else
+                    <View>
+                        <Text style={{
+                            fontFamily: 'Sora-SemiBold',
+                            fontSize: 24,
+                            marginBottom: 20,
+                            zIndex: 1
+                        }}>Activity</Text>
+                    </View>
+                    <ScrollView horizontal={false} refreshControl={
+                        <RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>
+                    }>
+                        {request != null ? (
+                            request.map(dt => {
+                                if (dt.data().amount !== undefined)
+                                    return <RequestItem fromID={dt.data().from} data={setCurrentData} transactionID={dt.data().transactionID}
+                                                        panel={panelRef} message={dt.data().message} docID={dt.id}
+                                                        from={dt.data().from} id={dt.id} change={dt.data().amount}
+                                                        name={dt.data().from} type={dt.data().type}/>
+                            })
+                        ) : (
+                            <></>
+                        )}
+                        {today !== null && today.length > 0 ?
+                            <Text style={{
+                                fontSize: 20,
+                                fontFamily: 'Sora-Regular',
+                                marginBottom: 10
+                            }}>Today</Text> : <></>
+                        }
+                        {today !== null && today.length > 0 ? (
+                            today.map(dt => {
+                                let statusText = "";
+                                if (dt.data().status === 0) {
+                                    statusText = "Pending"
+                                }
+                                if (dt.data().status === 1) {
+                                    statusText = "Accepted"
+                                }
+                                if (dt.data().status === 2) {
+                                    statusText = "Rejected"
+                                }
 
-  return (
-    <View>
-      <SafeAreaView style={styles.body}>
+                                if (dt.data().amount !== undefined)
+                                    return <TransactionItem nav={navigation} docID={dt.id} status={statusText}
+                                                            info={timeConverter(dt.data().date.seconds)}
+                                                            change={dt.data().recieved ? "+$" + dt.data().amount : "-$" + dt.data().amount}
+                                                            name={dt.data().to}/>
+                            })
+                        ) : (
+                            <></>
+                        )}
+                        {today !== null && today.length > 0 && data.length > 0 ?
+                            <Text style={{
+                                fontSize: 20,
+                                fontFamily: 'Sora-Regular',
+                                marginBottom: 10
+                            }}>All Transactions</Text> : <></>
+                        }
+                        {data != null ? (
+                            data.map(dt => {
+                                console.log(dt.data().from)
+                                let statusText = "";
+                                if (dt.data().status === 0) {
+                                    statusText = "Pending"
+                                }
+                                if (dt.data().status === 1) {
+                                    statusText = "Accepted"
+                                }
+                                if (dt.data().status === 2) {
+                                    statusText = "Rejected"
+                                }
 
-        <View>
-            <Text style={{fontFamily: 'Sora-SemiBold', fontSize: 24, marginBottom: 20, zIndex: 1}}>Activity</Text>
-        </View>
-          <ScrollView horizontal={false} refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>
-          }>
-              {request != null ? (
-                  request.map(dt => {
-                      if(dt.data().amount !== undefined)
-                          return <RequestItem data={setCurrentData} transactionID={dt.data().transactionID} panel={panelRef} message={dt.data().message} docID={dt.id} from={dt.data().from} id={dt.id} change={dt.data().amount} name={dt.data().from} type={dt.data().type}/>
-                  })
-              ) : (
-                  <></>
-              )}
-              {today !== null && today.length > 0 ?
-                  <Text style={{ fontSize: 20,
-                      fontFamily: 'Sora-Regular',
-                      marginBottom: 10}}>Today</Text> : <></>
-              }
-              {today !== null && today.length > 0 ? (
-                  today.map(dt => {
-                      let statusText = "";
-                      if(dt.data().status === 0){
-                          statusText = "Pending"
-                      }
-                      if(dt.data().status === 1){
-                          statusText = "Accepted"
-                      }
-                      if(dt.data().status === 2){
-                          statusText = "Rejected"
-                      }
-
-                      if(dt.data().price !== undefined)
-                          return <TransactionItem nav={navigation} docID={dt.id} status={statusText} info={timeConverter(dt.data().date.seconds)}  change={dt.data().recieved ? "+$" + dt.data().price : "-$" + dt.data().price} name={dt.data().to}/>
-                  })
-              ) : (
-                  <></>
-              )}
-              {today !== null && today.length > 0 ?
-                  <Text style={{ fontSize: 20,
-                      fontFamily: 'Sora-Regular',
-                      marginBottom: 10}}>All Transactions</Text> : <></>
-              }
-              {data != null ? (
-                  data.map(dt => {
-                      let statusText = "";
-                      if(dt.data().status === 0){
-                          statusText = "Pending"
-                      }
-                      if(dt.data().status === 1){
-                          statusText = "Accepted"
-                      }
-                      if(dt.data().status === 2){
-                          statusText = "Rejected"
-                      }
-
-                      if(dt.data().price !== undefined)
-                      return <TransactionItem nav={navigation} docID={dt.id} status={statusText} info={timeConverter(dt.data().date.seconds)}  change={dt.data().recieved ? "+$" + dt.data().price : "-$" + dt.data().price} name={dt.data().to}/>
-                  })
-              ) : (
-                  <></>
-              )}
-          </ScrollView>
-      </SafeAreaView>
-        <Accept panel={panelRef} reloadActionOne={getRequestsList} reloadActionTwo={getTransactionsList} transactionID={currentData.transactionID} amount={currentData.amount} fromID={currentData.fromID} message={currentData.msg} docID={currentData.docID}/>
-        <Toast config={toastConfig}/>
-    </View>
-  );
+                                if (dt.data().amount !== undefined)
+                                    return <TransactionItem nav={navigation} docID={dt.id} status={statusText}
+                                                            info={timeConverter(dt.data().date.seconds)}
+                                                            change={dt.data().recieved ? "+$" + dt.data().amount : "-$" + dt.data().amount}
+                                                            name={dt.data().from}/>
+                            })
+                        ) : (
+                            <></>
+                        )}
+                    </ScrollView>
+                </SafeAreaView>
+                <Accept type={currentData.type} panel={panelRef} reloadActionOne={getRequestsList} reloadActionTwo={getTransactionsList}
+                        transactionID={currentData.transactionID} amount={currentData.amount}
+                        name={currentData.name} fromID={currentData.fromID} message={currentData.msg} docID={currentData.docID}/>
+                <Toast config={toastConfig}/>
+            </View>
+        );
 }
 
-function Accept(props){
+function Accept(props) {
 
-
-    const [name, setName] = useState(null);
-
-    useEffect(()=>{
-        getUser(props.fromID).then((res)=>{
-            setName(res)
-        })
-
-    })
 
 
     return (
@@ -220,7 +226,7 @@ function Accept(props){
             }}>
                 <View>
                     <View style={{flexDirection: 'column', justifyContent: 'center', alignItems: "center"}}>
-                       <View style={{
+                        <View style={{
                             marginBottom: 10,
                             backgroundColor: 'white',
                             borderRadius: '100%',
@@ -234,15 +240,16 @@ function Accept(props){
                                     justifyContent: "center",
                                     alignItems: "center",
                                     backgroundColor: primaryColor,
-
-
                                 }}
                             >
-                                <Text style={{
-                                    fontFamily: "Sora-SemiBold",
-                                    fontSize: 36,
-                                    color: "white",
-                                }}>JP</Text>
+                                {props.name ?
+                                    <Text style={{
+                                        fontFamily: "Sora-SemiBold",
+                                        fontSize: 36,
+                                        color: "white",
+                                    }}>{props.name.toString().split(" ")[0].substring(0, 1)}{props.name.toString().split(" ")[1].substring(0, 1)}</Text> : <></>
+                                }
+
                             </View>
                         </View>
 
@@ -262,34 +269,58 @@ function Accept(props){
                             marginTop: 20,
                             fontFamily: 'Sora-Regular',
                             textAlign: 'center'
-                        }}>Incoming Payment by</Text>
-                        {name != null ?
-                        <Text style={{
-                            fontSize: 24,
-                            marginTop: 10,
-                            fontFamily: 'Sora-SemiBold',
-                            textAlign: 'center'
-                        }}>{name}</Text>
-                            : <></>
-                        }
+                        }}>Incoming Transfer by</Text>
 
-                        <View style={{flexDirection: 'row', justifyContent: "space-between", marginTop: 30, alignItems: "center", width: "100%"}}>
+                            <Text style={{
+                                fontSize: 24,
+                                marginTop: 10,
+                                fontFamily: 'Sora-SemiBold',
+                                textAlign: 'center'
+                            }}>{props.name}</Text>
+
+
+
+                        <View style={{
+                            flexDirection: 'row',
+                            justifyContent: "space-between",
+                            marginTop: 30,
+                            alignItems: "flex-end",
+                            width: "100%"
+                        }}>
                             {props.amount != null ?
-                            <Text style={{fontFamily: 'Sora-SemiBold', fontSize: 36}}>${props.amount.includes(".") ? props.amount : props.amount + ".00"}</Text>
+                                <Text style={{
+                                    fontFamily: 'Sora-SemiBold',
+                                    fontSize: 36
+                                }}>{props.type === 2 ? "" : "$"}{props.amount.includes(".") || props.type === 2 ? props.amount : props.amount + ".00"}</Text>
                                 : <></>
                             }
-                                <Text style={{fontFamily: 'Sora-Regular', fontSize: 16}}>DuckBills</Text>
-                            {/* TODO: CHANGE TYPE TO DYNAMIC */}
+                           <GetType type={props.type}/>
 
                         </View>
-                        <View style={{height: 1, borderColor: '#f1f1f1', width: '100%', position: 'relative', borderWidth: .2, marginTop: 10}}>
+                        <View style={{
+                            height: 1,
+                            borderColor: '#f1f1f1',
+                            width: '100%',
+                            position: 'relative',
+                            borderWidth: .2,
+                            marginTop: 10
+                        }}>
                         </View>
-                        <View style={{flexDirection: 'column', justifyContent: "flex-start", marginTop: 30, alignItems: "flex-start", width: "100%"}}>
+                        <View style={{
+                            flexDirection: 'column',
+                            justifyContent: "flex-start",
+                            marginTop: 30,
+                            alignItems: "flex-start",
+                            width: "100%"
+                        }}>
 
                             <Text style={{fontFamily: 'Sora-Regular', fontSize: 16, color: 'gray'}}>Message</Text>
-                            <Text style={{fontFamily: 'Sora-SemiBold', fontSize: 16, color: 'black', marginTop: 10}}>{props.message}</Text>
-
-
+                            <Text style={{
+                                fontFamily: 'Sora-SemiBold',
+                                fontSize: 16,
+                                color: 'black',
+                                marginTop: 10
+                            }}>{props.message}</Text>
 
 
                         </View>
@@ -301,11 +332,11 @@ function Accept(props){
                             maxWidth: '100%',
                             marginTop: 20
                         }}>
-
                             <TouchableOpacity onPress={() => {
                                 Haptics.selectionAsync()
-                                if(props.docID !== null) {
-                                    deleteRequest(props.fromID, "20011188", props.amount, 0, props.transactionID, props.docID).then(()=>{
+                                if (props.docID !== null) {
+                                    console.log(props.fromID)
+                                    deleteRequest(props.fromID, "20011188", props.amount, 0, props.transactionID, props.docID).then(() => {
                                         props.reloadActionOne("20011188")
                                         props.reloadActionTwo("20011188")
                                         props.panel.current?.togglePanel()
@@ -316,7 +347,7 @@ function Accept(props){
                                     //Modify transaction to change status to rejected - 2
                                 }
                             }} style={{
-                                flex:1,
+                                flex: 1,
                                 borderWidth: 1,
                                 borderColor: 'black',
                                 padding: 15,
@@ -334,8 +365,8 @@ function Accept(props){
                             <TouchableOpacity onPress={() => {
                                 Haptics.selectionAsync()
 
-                                if(props.docID !== null) {
-                                    acceptRequest(props.fromID, "20011188", props.amount, 0, props.transactionID, props.docID).then(()=>{
+                                if (props.docID !== null) {
+                                    acceptRequest(props.fromID, "20011188", props.amount, 0, props.transactionID, props.docID).then(() => {
                                         props.reloadActionOne("20011188")
                                         props.reloadActionTwo("20011188")
                                         props.panel.current?.togglePanel()
@@ -344,7 +375,7 @@ function Accept(props){
                                 }
 
                             }} style={{
-                                flex:1,
+                                flex: 1,
                                 borderWidth: 1,
                                 borderColor: primaryColor,
                                 backgroundColor: primaryColor,
@@ -373,30 +404,30 @@ function Accept(props){
 }
 
 
-export function Notifications(){
+export function Notifications() {
 
     const Stack = createStackNavigator();
 
 
-        return (
+    return (
 
-            <NavigationContainer independent={true}>
-                <Stack.Navigator
-                    lazy={true}
-                    optimizationsEnabled={true}
-                    screenOptions={{
-                        headerShown: false,
-                        useNativeDriver: false,
-                        cardStyleInterpolator: forFade,
-                    }}
-                    initialRouteName="Notifications">
-                    <Stack.Screen name="Notifications" component={NotificationsComp}/>
-                    <Stack.Screen name="TransactionDetail" component={TransactionDetail}/>
+        <NavigationContainer independent={true}>
+            <Stack.Navigator
+                lazy={true}
+                optimizationsEnabled={true}
+                screenOptions={{
+                    headerShown: false,
+                    useNativeDriver: false,
+                    cardStyleInterpolator: forFade,
+                }}
+                initialRouteName="Notifications">
+                <Stack.Screen name="Notifications" component={NotificationsComp}/>
+                <Stack.Screen name="TransactionDetail" component={TransactionDetail}/>
 
 
-                </Stack.Navigator>
-            </NavigationContainer>
-        )
+            </Stack.Navigator>
+        </NavigationContainer>
+    )
 }
 
 const styles = StyleSheet.create({

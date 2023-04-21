@@ -66,7 +66,7 @@ async function getRequest(id){
     return await getDocs(query((collection(db, "users", id, "requests")), orderBy('date', 'asc')))
 }
 
-async function addTransaction(id, price, to, type, recieved, from, status){
+async function addTransaction(id, amount, to, type, recieved, from, status){
     //Payment Type
     // 0 - DuckBills
     // 1 - Dining Dollars
@@ -83,7 +83,7 @@ async function addTransaction(id, price, to, type, recieved, from, status){
 
     await setDoc(docRef, {
         date: serverTimestamp(),
-        price: price,
+        amount: amount,
         to: to,
         type: type,
         recieved: recieved,

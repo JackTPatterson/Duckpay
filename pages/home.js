@@ -196,7 +196,7 @@ export function Home() {
         getTransactions("20011188").then(res => {
             let lst = []
             res.forEach((data) => {
-                if (lst.length <= 3 && data.data().price !== undefined) {
+                if (lst.length <= 3 && data.data().amount !== undefined) {
                     lst.push(data)
                 }
             })
@@ -592,11 +592,11 @@ export function Home() {
                                                     statusText = "Rejected"
                                                 }
 
-                                                if (dt.data().price !== undefined)
+                                                if (dt.data().amount !== undefined)
                                                     return <TransactionItem home docID={dt.id} nav={navigation}
                                                                             status={statusText}
                                                                             info={timeConverter(dt.data().date.seconds)}
-                                                                            change={dt.data().recieved ? "+$" + dt.data().price : "-$" + dt.data().price}
+                                                                            change={dt.data().recieved ? "+$" + dt.data().amount : "-$" + dt.data().amount}
                                                                             name={dt.data().to}/>
                                             })
                                         ) : (
