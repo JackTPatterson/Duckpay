@@ -63,7 +63,6 @@ export const TransactionDetail = ({navigation, route}) => {
                         }}>
                         <TouchableOpacity onPress={()=>{
                             navigation.pop();
-                            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                         }}>
                             <Ionicons name={"chevron-back-outline"} size={30}/>
                         </TouchableOpacity>

@@ -38,7 +38,7 @@ export const GetID = ({navigation, route}) => {
 
 
     function handleInput(digitVal){
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        Haptics.selectionAsync()
         if (!digit.includes(".")) {
             setKey((digit) => digit + digitVal);
         }
@@ -65,7 +65,6 @@ export const GetID = ({navigation, route}) => {
                             }}>
                             <TouchableOpacity onPress={()=>{
                                 navigation.pop();
-                                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                             }}>
                                 <Ionicons name={"chevron-back-outline"} size={30}/>
                             </TouchableOpacity>
@@ -296,7 +295,7 @@ export const GetID = ({navigation, route}) => {
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     onPress={() => {
-                                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                                        Haptics.selectionAsync()
                                         setKey((digit) => digit.slice(0, -1))
 
 

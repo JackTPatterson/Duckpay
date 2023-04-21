@@ -13,22 +13,23 @@ import {
     getTransactions,
     getRequest,
     deleteRequest,
-    acceptRequest, getUser, deleteTransaction, changeTransactionStatus
+    acceptRequest, getUser, changeTransactionStatus
 } from '../Scripts/HandleDB';
 import * as Haptics from "expo-haptics";
 import * as React from "react";
 import { SafeAreaView } from "react-navigation";
 import {useFonts} from "expo-font";
 import {TransactionItem, RequestItem} from "../components/TransactionItem";
-import {useCallback, useEffect, useRef, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import primaryColor from "../Constants";
 import BottomSheet from "react-native-simple-bottom-sheet";
 import {timeConverter} from "../Scripts/timeconverter";
 import {NavigationContainer} from "@react-navigation/native";
 import {TransactionDetail} from "./TransactionDetail";
 import {createStackNavigator} from "@react-navigation/stack";
-import Toast, {BaseToast} from "react-native-toast-message";
-
+import {forFade} from "../Scripts/home/interpolators";
+import Toast from "react-native-toast-message";
+import {toastConfig} from "../Scripts/toast";
 
 export const NotificationsComp = ({navigation}) => {
     const [data, setData] = useState(null)
@@ -41,20 +42,12 @@ export const NotificationsComp = ({navigation}) => {
 
 
     useEffect(()=> {
-        Toast.show({
-            type: 'tomatoToast',
-            text1: 'This is an info message'
-        });
-
         if(request == null){
             getRequestsList("20011188")
         }
-
         if(data == null){
             getTransactionsList("20011188")
-
         }
-
     })
 
     function getTransactionsList(id){
@@ -63,58 +56,23 @@ export const NotificationsComp = ({navigation}) => {
             let todayLst = []
             let lst = []
             res.forEach((data)=> {
-                console.log(new Date(data.data().date.seconds*1000).toDateString() === new Date().toDateString())
                 if(new Date(data.data().date.seconds*1000).toDateString() === new Date().toDateString()){
                     todayLst.push(data);
                 }
                 else {
-                    lst.push(data);
+                    if(lst.length < 10) {
+                        lst.push(data);
+                    }
                 }
                 }
-
-
             )
-
-            console.log(todayLst)
             setData(lst)
             setToday(todayLst);
         })
 
     }
 
-    const toastConfig = {
-        /*
-          Overwrite 'success' type,
-          by modifying the existing `BaseToast` component
-        */
-        success: (props) => (
-            <BaseToast
-                {...props}
-                style={{ borderLeftColor: 'pink' }}
-                contentContainerStyle={{ paddingHorizontal: 15 }}
-                text1Style={{
-                    fontSize: 15,
-                    fontWeight: '400'
-                }}
-            />
-        ),
-        /*
-          Overwrite 'error' type,
-          by modifying the existing `ErrorToast` component
 
-        /*
-          Or create a completely new type - `tomatoToast`,
-          building the layout from scratch.
-
-          I can consume any custom `props` I want.
-          They will be passed when calling the `show` method (see below)
-        */
-        tomatoToast: ({ text1, props }) => (
-            <View style={{ height: 60, width: '100%', backgroundColor: 'tomato' }}>
-                <Text>{text1}</Text>
-            </View>
-        )
-    };
 
 
 
@@ -224,8 +182,7 @@ export const NotificationsComp = ({navigation}) => {
           </ScrollView>
       </SafeAreaView>
         <Accept panel={panelRef} reloadActionOne={getRequestsList} reloadActionTwo={getTransactionsList} transactionID={currentData.transactionID} amount={currentData.amount} fromID={currentData.fromID} message={currentData.msg} docID={currentData.docID}/>
-
-    <Toast config={toastConfig}/>
+        <Toast config={toastConfig}/>
     </View>
   );
 }
@@ -346,7 +303,7 @@ function Accept(props){
                         }}>
 
                             <TouchableOpacity onPress={() => {
-                                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                                Haptics.selectionAsync()
                                 if(props.docID !== null) {
                                     deleteRequest(props.fromID, "20011188", props.amount, 0, props.transactionID, props.docID).then(()=>{
                                         props.reloadActionOne("20011188")
@@ -375,7 +332,7 @@ function Accept(props){
                             </TouchableOpacity>
 
                             <TouchableOpacity onPress={() => {
-                                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                                Haptics.selectionAsync()
 
                                 if(props.docID !== null) {
                                     acceptRequest(props.fromID, "20011188", props.amount, 0, props.transactionID, props.docID).then(()=>{
@@ -430,6 +387,7 @@ export function Notifications(){
                     screenOptions={{
                         headerShown: false,
                         useNativeDriver: false,
+                        cardStyleInterpolator: forFade,
                     }}
                     initialRouteName="Notifications">
                     <Stack.Screen name="Notifications" component={NotificationsComp}/>

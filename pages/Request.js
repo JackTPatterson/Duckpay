@@ -125,7 +125,7 @@ export const Request = ({navigator, route}) => {
                     }}>
 
                         <TouchableOpacity onPress={() => {
-                            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                            Haptics.selectionAsync()
                             deleteRequest("20011188",  route.params.data).then(()=>showReject()).catch(()=>showFail())
                         }} style={{
                             flex:1,
@@ -144,7 +144,7 @@ export const Request = ({navigator, route}) => {
                         </TouchableOpacity>
 
                         <TouchableOpacity onPress={() => {
-                            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                            Haptics.selectionAsync()
                             acceptRequest(data.data().from, "20011188", 1, data.data().type, route.params.data).then(()=>showSuccess()).catch(()=>showFail())
                         }} style={{
                             flex:1,

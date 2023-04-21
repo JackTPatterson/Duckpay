@@ -31,6 +31,8 @@ function TransactionItem(props){
             if(props.nav !== null) {
                     props.nav.push("TransactionDetail", {data: props.docID})
             }
+            Haptics.selectionAsync();
+
         }
         } style={{
             flexDirection: 'row',
@@ -103,7 +105,7 @@ function RequestItem(props){
 
     return (
         <TouchableOpacity onPress={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            Haptics.impactAsync(Haptics.selectionAsync());
             props.data({amount: props.change, fromID: props.from, msg: props.message, docID: props.docID, transactionID: props.transactionID})
             props.panel.current?.togglePanel();
             console.log(props.transactionID)

@@ -10,7 +10,7 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import {UserBox} from "../components/UserBox";
 import Svg, {Path} from "react-native-svg";
 import {useEffect, useState} from "react";
-import {getFriends, getUser} from "../Scripts/HandleDB";
+import {getFriends, getTransactions, getUser} from "../Scripts/HandleDB";
 
 export const SendComp = ({navigation}) => {
 
@@ -22,17 +22,21 @@ export const SendComp = ({navigation}) => {
     })
 
     function getFriendsList(id){
-        if(friends === null) {
+
+        if(friends == null) {
+
             getFriends(id).then(res => {
                 let lst = []
-                res.data().friends.forEach((data) => {
-                        lst.push(data)
+                res.forEach((data) => {
+                        lst.push(data);
                     }
                 )
-                setFriends(lst);
+                setFriends(lst)
             })
         }
+
     }
+
 
     let fontLoaded = useFonts({
         "Sora-Regular": require("../assets/fonts/Sora-Regular.ttf"),
@@ -54,7 +58,6 @@ export const SendComp = ({navigation}) => {
                         }}>
                         <TouchableOpacity onPress={()=>{
                             navigation.pop();
-                            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                         }}>
                             <Ionicons name={"chevron-back-outline"} size={30}/>
                         </TouchableOpacity>
@@ -89,7 +92,7 @@ export const SendComp = ({navigation}) => {
 
                         {friends != null ? (
                             friends.map(dt => {
-                                    return (<UserBox key={dt.id} navigate={navigation} name={dt}/>)})
+                                    return (<UserBox send={true} key={dt.id} navigate={navigation} name={dt.data().id}/>)})
                         ) : (
                             <Text>Loading</Text>
                         )}

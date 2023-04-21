@@ -11,6 +11,8 @@ import {UserBox} from "../components/UserBox";
 import Svg, {Path} from "react-native-svg";
 import {useEffect, useState} from "react";
 import {getFriends, getUser} from "../Scripts/HandleDB";
+import {toastConfig} from "../Scripts/toast";
+import Toast from "react-native-toast-message";
 
 export const Message = ({navigation, route}) => {
 
@@ -36,6 +38,8 @@ export const Message = ({navigation, route}) => {
         }
     }
 
+
+
     let fontLoaded = useFonts({
         "Sora-Regular": require("../assets/fonts/Sora-Regular.ttf"),
         "Sora-SemiBold": require("../assets/fonts/Sora-SemiBold.ttf"),
@@ -58,7 +62,13 @@ export const Message = ({navigation, route}) => {
                             if(message !== null) {
                                 navigation.push("Keypad", {data: route.params.data, message: message});
                             }
-                            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                            else {
+                                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning)
+                                Toast.show({
+                                    type: 'tomatoToast',
+                                    text1: 'Please Enter A Message'
+                                });
+                            }
                         }}>
                             <Ionicons name={"chevron-back-outline"} size={30}/>
                         </TouchableOpacity>
@@ -75,6 +85,7 @@ export const Message = ({navigation, route}) => {
 
 
 
+                    <Toast config={toastConfig}/>
 
                 </SafeAreaView>
 

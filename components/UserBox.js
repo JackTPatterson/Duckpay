@@ -3,6 +3,7 @@ import * as React from "react";
 import primaryColor from "../Constants";
 import {getUser} from "../Scripts/HandleDB";
 import {useEffect, useState} from "react";
+import * as Haptics from "expo-haptics";
 export function UserBox(props){
 
     const [name, setname] = useState(null);
@@ -23,8 +24,15 @@ export function UserBox(props){
     catch{}
 
     return (
-        <TouchableOpacity onPress={()=>{
+        <TouchableOpacity send onLongPress={()=>{
+            if(!props.send) {
+                props.panel.current?.togglePanel();
+                Haptics.selectionAsync();
+            }
+        }} onPress={()=>{
             props.navigate.push("Keypad", {data: props.name})
+            Haptics.selectionAsync();
+
         }} style={{
             alignItems: 'center',
             marginTop: 20,

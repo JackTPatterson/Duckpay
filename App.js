@@ -48,7 +48,6 @@ export default function App() {
             tabBarShowLabel: false,
             tabBarIcon: ({ focused, color, size }) => {
 
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               // You can return any component that you like here!
               if (route.name === "Home"){
                 return (

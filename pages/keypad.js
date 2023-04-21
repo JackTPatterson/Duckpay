@@ -3,7 +3,7 @@ import {
     Text,
     TouchableOpacity,
     View,
-    AppLoading, Dimensions, Easing,
+    AppLoading, Dimensions, Easing, Animated,
 
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -19,6 +19,8 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import Svg, {Path} from "react-native-svg";
 import primaryColor from "../Constants";
 import {addFriend, addTransaction, getQuickPay, createRequest, getUser} from '../Scripts/HandleDB';
+import Toast from "react-native-toast-message";
+import {UserBottomSheet} from "../components/UserBottomSheet";
 
 export const Keypad = ({navigation, route}) => {
 
@@ -29,6 +31,7 @@ export const Keypad = ({navigation, route}) => {
     const panelRef = React.useRef(null);
     const panelRef2 = React.useRef(null);
     const panelRef3 = React.useRef(null);
+    const panelRef4 = React.useRef(null);
 
     const animation1 = useRef(null);
     const animation2 = useRef(null);
@@ -44,8 +47,6 @@ export const Keypad = ({navigation, route}) => {
         })
     })
 
-
-
     let fontLoaded = useFonts({
         "Sora-Regular": require("../assets/fonts/Sora-Regular.ttf"),
         "Sora-SemiBold": require("../assets/fonts/Sora-SemiBold.ttf"),
@@ -55,7 +56,7 @@ export const Keypad = ({navigation, route}) => {
 
 
     function handleInput(digitVal){
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        Haptics.selectionAsync()
         if (!digit.includes(".")) {
                 setKey((digit) => digit + digitVal);
         }
@@ -85,14 +86,14 @@ export const Keypad = ({navigation, route}) => {
                             }}>
                             <TouchableOpacity onPress={()=>{
                                 navigation.popToTop();
-                                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                             }}>
                                 <Ionicons name={"chevron-back-outline"} size={30}/>
                             </TouchableOpacity>
                             <Text style={{fontFamily: 'Sora-SemiBold', fontSize: 20}}>Transfer</Text>
                             <TouchableOpacity onPress={()=>{
                                 // addFriend("20011199")
-                                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                                Haptics.selectionAsync()
+                                panelRef4.current?.togglePanel();
                             }}>
                                 <View
                                     style={{
@@ -120,7 +121,7 @@ export const Keypad = ({navigation, route}) => {
                         </View>
                         <View>
                             <TouchableOpacity onPress={() => {
-                                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                                Haptics.selectionAsync()
                                 panelRef2.current.togglePanel();
                             }} style={{
                                 borderRadius: 15,
@@ -131,7 +132,7 @@ export const Keypad = ({navigation, route}) => {
                             </TouchableOpacity>
 
                             <TouchableOpacity onPress={() => {
-                                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                                Haptics.selectionAsync()
                                 panelRef2.current.togglePanel();
                             }} style={{
                                 borderRadius: 15,
@@ -159,7 +160,7 @@ export const Keypad = ({navigation, route}) => {
 
                             </TouchableOpacity>
                             <TouchableOpacity onPress={() => {
-                                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                                Haptics.selectionAsync()
                                 navigation.push("Message", {data: route.params.data})
 
 
@@ -411,7 +412,9 @@ export const Keypad = ({navigation, route}) => {
                             >
                                 <TouchableOpacity
                                     onPress={() => {
-                                        handleInput(".");
+                                        if(digit.length > 0) {
+                                            handleInput(".");
+                                        }
                                     }}
                                     style={{
                                         width: 70,
@@ -426,7 +429,9 @@ export const Keypad = ({navigation, route}) => {
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     onPress={() => {
-                                        handleInput("0");
+                                        if(digit.length > 0) {
+                                            handleInput("0");
+                                        }
                                     }}
                                     style={{
                                         width: 70,
@@ -441,7 +446,7 @@ export const Keypad = ({navigation, route}) => {
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     onPress={() => {
-                                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                                        Haptics.selectionAsync()
                                             setKey((digit) => digit.slice(0, -1))
                                     }}
                                     style={{
@@ -461,7 +466,8 @@ export const Keypad = ({navigation, route}) => {
 
                                 </TouchableOpacity>
                             </View>
-                            {digit.length === 0 || route.params.message === undefined ?
+                            {digit.length === 0 || route.params.message === undefined || (parseInt(digit) < 0.01)
+                             ?
                                 <TouchableOpacity disabled style={{
                                     width: '100%',
                                     borderColor: '#f1f1f1',
@@ -494,6 +500,7 @@ export const Keypad = ({navigation, route}) => {
                                         setKey((digit) => digit + "0");
                                     }
                                     panelRef.current.togglePanel();
+
                                 }} style={{
                                     width: '100%',
                                     borderWidth: 1,
@@ -519,6 +526,7 @@ export const Keypad = ({navigation, route}) => {
                         animation={Easing.inOut(Easing.poly(5))}
                         sliderMinHeight={-20}
                         isOpen={false}
+
                         style={{
                             padding: 20,
 
@@ -529,6 +537,8 @@ export const Keypad = ({navigation, route}) => {
 
                         ref={(ref) => (panelRef.current = ref)}
                     >
+                        <View>
+
                         <View style={{flexDirection: "row", width: '100%', alignItems: 'center', marginBottom: 30, justifyContent: 'space-between'}}>
                             <Text style={{
                                 fontSize: 24,
@@ -542,8 +552,6 @@ export const Keypad = ({navigation, route}) => {
                         <Text style={{fontSize: 20, fontFamily: 'Sora-Regular', textAlign: 'center', marginTop: 20}}>You are are about to send</Text>
                         <Text style={{fontSize: 42, fontFamily: 'Sora-SemiBold', textAlign: 'center', marginTop: 20}}>${digit}</Text>
                         <Text style={{fontSize: 20, fontFamily: 'Sora-Regular', textAlign: 'center', marginVertical: 20}}>to {name}</Text>
-
-
                         <View style={{
                             flexDirection: 'row',
                             marginBottom: 20,
@@ -551,14 +559,9 @@ export const Keypad = ({navigation, route}) => {
                             maxWidth: '100%',
                             marginTop: 20
                         }}>
-                            <View>
-                                <Text>
-
-                                </Text>
-                            </View>
                             <TouchableOpacity onPress={() => {
                                 panelRef.current.togglePanel();
-                                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                                Haptics.selectionAsync()
                                 navigation.push('Home');
                             }} style={{
                                 flex:1,
@@ -578,7 +581,7 @@ export const Keypad = ({navigation, route}) => {
 
                             <TouchableOpacity onPress={() => {
                                 panelRef.current.togglePanel();
-                                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                                Haptics.selectionAsync()
                                 panelRef3.current.togglePanel();
 
 
@@ -599,6 +602,8 @@ export const Keypad = ({navigation, route}) => {
                                 }}>Confirm</Text>
                             </TouchableOpacity>
                         </View>
+                        </View>
+
 
                     </BottomSheet>
                     <BottomSheet
@@ -763,6 +768,7 @@ export const Keypad = ({navigation, route}) => {
                         </View>
 
                     </BottomSheet>
+                    <UserBottomSheet toast={Toast} friendID={route.params.data} panel={panelRef4}/>
                 </SafeAreaView>
             </View>
         );

@@ -118,12 +118,9 @@ async function changeTransactionStatus(id, docID, status){
 async function setQuickPay(id){
 
     const docRef = collection(db, "users", id, "quickpay");
-
     if((await getQuickPay(id)).size < 4){
         await setDoc(doc(docRef), {id: id});
     }
-
-
 }
 
 async function getQuickPay(id){
@@ -140,12 +137,12 @@ async function activeUser(id){
 }
 
 async function getFriends(id){
-    return await getDoc(doc(db, "users", id));
+    return await getDocs(collection(db, "users", id, "friends"));
 }
 
-async function addFriend(id){
-    await updateDoc(doc(usersRef, "20011188"), {
-        friends: arrayUnion(id) });
+async function addFriend(id, friendID){
+    const docRef = collection(db, "users", id, "friends");
+        await setDoc(doc(docRef), {id: friendID});
 }
 
 async function isFriend(id){
