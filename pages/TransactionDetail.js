@@ -13,6 +13,7 @@ import {useEffect, useState} from "react";
 import {getTransaction, getUser} from "../Scripts/HandleDB";
 import NumberTicker from "../components/TextTicker";
 import {GetType} from "../Scripts/GetType";
+import ActivityIndicator from "../components/ActivityIndicator";
 
 export const TransactionDetail = ({navigation, route}) => {
 
@@ -49,8 +50,8 @@ export const TransactionDetail = ({navigation, route}) => {
         "Sora-SemiBold": require("../assets/fonts/Sora-SemiBold.ttf"),
     });
 
-    if (!fontLoaded)
-        return <AppLoading/>
+    if (!fontLoaded || data === null)
+        return <ActivityIndicator/>
     else
         return (
             <View>

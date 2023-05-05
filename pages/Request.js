@@ -9,6 +9,7 @@ import {useEffect, useState} from "react";
 import Toast, { BaseToast, ErrorToast } from 'react-native-toast-message';
 import Ionicons from "react-native-vector-icons/Ionicons";
 import primaryColor from "../Constants";
+import ActivityIndicator from "../components/ActivityIndicator";
 
 
 
@@ -31,6 +32,7 @@ export const Request = ({navigator, route}) => {
 
 
     const showSuccess = () => {
+
         Toast.show({
             type: 'success',
             text1: 'Request Accepted',
@@ -95,9 +97,8 @@ export const Request = ({navigator, route}) => {
         "Sora-SemiBold": require("../assets/fonts/Sora-SemiBold.ttf"),
     });
 
-    if(!fontLoaded){
-        return <></>
-    }
+    if (!fontLoaded || data === null)
+        return <ActivityIndicator/>
     else
 
         return (

@@ -3,8 +3,10 @@ import * as React from "react";
 import {BaseToast} from "react-native-toast-message";
 import * as Haptics from "expo-haptics";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import {selectionAsync} from "expo-haptics";
 
 export const toastConfig = {
+
     /*
       Overwrite 'success' type,
       by modifying the existing `BaseToast` component

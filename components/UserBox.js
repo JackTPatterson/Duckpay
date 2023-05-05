@@ -1,20 +1,30 @@
 import {Text, TouchableOpacity, View} from "react-native";
 import * as React from "react";
 import primaryColor from "../Constants";
-import {getUser} from "../Scripts/HandleDB";
+import {getUser, getUserColor} from "../Scripts/HandleDB";
 import {useEffect, useState} from "react";
 import * as Haptics from "expo-haptics";
 export function UserBox(props){
 
-    const [name, setname] = useState(null);
+
+    const [name, setName] = useState("ALoading AName");
+
+    const [color, setColor] = useState(primaryColor);
 
     useEffect(()=>{
         getUser(props.name).then(res=>{
-            setname(res);
+            setName(res);
+        }).then(()=>{
+            getUserColor(props.name).then((res)=>{
+                setColor(res)
+
+            })
         })
     })
 
-    let firstLetter = name;
+
+
+    let firstLetter = "";
     let lastLetter = ""
 
     try{
@@ -30,7 +40,7 @@ export function UserBox(props){
                 Haptics.selectionAsync();
             }
         }} onPress={()=>{
-            props.navigate.push("Keypad", {data: props.name})
+            props.navigate.push("Keypad", {data: props.name, docID: props.docID})
             Haptics.selectionAsync();
 
         }} style={{
@@ -53,7 +63,7 @@ export function UserBox(props){
                             borderRadius: '100%',
                             justifyContent: "center",
                             alignItems: "center",
-                            backgroundColor: primaryColor,
+                            backgroundColor: color
 
 
                         }}

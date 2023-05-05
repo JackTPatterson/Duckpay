@@ -74,8 +74,8 @@ function TransactionItem(props){
                 </View>
             </View>
             <View>
-                <Text style={{fontFamily: 'Sora-SemiBold', marginTop: 10, textAlign: 'center', fontSize: 20}}>{(props.change.toString().includes(".") ? props.change : props.change + ".00")}</Text>
-                <Text style={{fontFamily: 'Sora-SemiBold', marginTop: 2, textAlign: 'right', fontSize: 10}}>{props.status}</Text>
+                <Text style={{fontFamily: 'Sora-SemiBold', textAlign: 'center', fontSize: 20}}>{(props.change.toString().includes(".") ? props.change : props.change + ".00")}</Text>
+                <Text style={{color: '#aaacae', fontFamily: 'Sora-Regular', textAlign: 'right'}}>{props.status}</Text>
 
             </View>
         </TouchableOpacity>

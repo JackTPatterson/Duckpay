@@ -34,7 +34,6 @@ import {UserBox} from "../components/UserBox";
 import {getQuickPay, getTransactions, getUser, setQuickPay} from "../Scripts/HandleDB";
 import {Setup} from "./Setup";
 import {GetID} from "./GetID";
-import {forFade} from "../Scripts/home/interpolators";
 import {Request} from "./Request";
 import {timeConverter} from "../Scripts/timeconverter";
 import {TransactionDetail} from "./TransactionDetail";
@@ -42,6 +41,8 @@ import {Message} from "./Message";
 import Toast from "react-native-toast-message";
 import {toastConfig} from "../Scripts/toast";
 import {UserBottomSheet} from "../components/UserBottomSheet";
+import ActivityIndicator from "../components/ActivityIndicator";
+import notifyTester, {schedulePushNotification} from "../Scripts/NotificationsTester";
 
 export function Home() {
 
@@ -175,7 +176,7 @@ export function Home() {
         Haptics.selectionAsync()
     }
 
-    function getDiningDollars() {
+    async function getDiningDollars()  {
         setBalance("$200.00")
         changeBalanceType(1);
 
@@ -227,8 +228,8 @@ export function Home() {
     });
 
     const HomeComp = ({navigation}) => {
-        if (!fontLoaded) {
-            return <></>
+        if (!fontLoaded || !data) {
+            return <ActivityIndicator/>
         } else
             return (
                 <View>
@@ -297,7 +298,7 @@ export function Home() {
                                         paddingVertical: 10
                                     } : {
                                         flex: 1,
-                                        backgroundColor: 'transparent',
+                                        backgroundColor: '#f9f9f9',
                                         borderRadius: '100%',
                                         paddingVertical: 10
                                     }}>
@@ -325,7 +326,7 @@ export function Home() {
                                         paddingVertical: 10
                                     } : {
                                         flex: 1,
-                                        backgroundColor: 'transparent',
+                                        backgroundColor: '#f9f9f9',
                                         borderRadius: '100%',
                                         paddingVertical: 10
                                     }}>
@@ -544,7 +545,7 @@ export function Home() {
 
                                 {quickPay != null ? (
                                     quickPay.map(dt => {
-                                        return <UserBox panel={panelRef4} key={dt.id} navigate={navigation} name={dt.data().id}/>
+                                        return <UserBox send={true} panel={panelRef4} docID={dt.id} navigate={navigation} name={dt.data().id}/>
                                     })
                                 ) : (
                                     <Text>Loading</Text>
@@ -578,7 +579,7 @@ export function Home() {
                                                 fontFamily: 'Sora-Regular',
                                             }}>Recent Transactions</Text>
                                         </View>
-                                        {data != null ? (
+                                        {data.length ? (
                                             data.map(dt => {
 
                                                 let statusText = "";
@@ -599,9 +600,26 @@ export function Home() {
                                                                             change={dt.data().recieved ? "+$" + dt.data().amount : "-$" + dt.data().amount}
                                                                             name={dt.data().to}/>
                                             })
-                                        ) : (
-                                            <Text>Loading</Text>
-                                        )}
+                                        ) : <View>
+                                            <Text style={{
+                                                fontFamily: 'Sora-SemiBold',
+                                                fontSize: 24,
+                                                marginTop: 20,
+                                                marginBottom: 0,
+                                                zIndex: 1
+                                            }}>Nothing To See Here</Text>
+                                            <Text style={{
+                                                fontFamily: 'Sora-Regular',
+                                                fontSize: 16,
+                                                textAlign: 'left',
+                                                maxWidth: 300,
+                                                marginVertical: 10,
+                                                marginBottom: 50,
+                                                zIndex: 1
+                                            }}>When a transaction is made, it will appear here</Text>
+                                        </View>
+
+                                        }
                                     </View>
                                 </View>
 
@@ -689,7 +707,7 @@ export function Home() {
 
 
                                         </TouchableOpacity>
-                                        <TouchableOpacity onPress={async () => {
+                                        <TouchableOpacity onPress={ () => {
                                             Toast.show({
                                                 type: 'tomatoToast',
                                                 text1: 'ID Copied'
@@ -1114,7 +1132,7 @@ export function Home() {
                                 </View>
                             </View>
                         </BottomSheet>
-                        <UserBottomSheet toast={Toast} panel={panelRef4}/>
+
                     </SafeAreaView>
 
                 </View>
@@ -1136,7 +1154,6 @@ export function Home() {
                     screenOptions={{
                         headerShown: false,
                         useNativeDriver: false,
-                        cardStyleInterpolator: forFade,
                     }}
                     initialRouteName="Home">
                     <Stack.Screen name="Setup" component={Setup}/>

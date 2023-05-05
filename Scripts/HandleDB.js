@@ -1,6 +1,5 @@
 import {initializeApp} from 'firebase/app';
 import {
-    arrayUnion,
     collection,
     doc,
     getDoc,
@@ -12,7 +11,7 @@ import {
     deleteDoc,
     query,
     orderBy,
-    limit
+    where
 } from 'firebase/firestore';
 
 // Initialize Firebase
@@ -31,7 +30,7 @@ const db = getFirestore()
 
 const usersRef = collection(db, "users");
 
-async function createRequest(from, to, amount, type, message, transactionID){
+async function createRequest(from, to, amount, type, message, transactionID) {
     const docRef = collection(db, "users", to, "requests");
     await setDoc(doc(docRef), {
         date: serverTimestamp(),
@@ -44,29 +43,29 @@ async function createRequest(from, to, amount, type, message, transactionID){
     });
 }
 
-async function getSingleRequest(id, docID){
+async function getSingleRequest(id, docID) {
     return await getDoc(doc(db, "users", id, "requests", docID));
 }
 
-async function acceptRequest(from, to, amount, type, docID, reqID){
+async function acceptRequest(from, to, amount, type, docID, reqID) {
     await addTransaction(to, amount, to, type, true, from, 1)
     await changeTransactionStatus(from, docID, 1)
     await deleteDoc(doc(db, "users", to, "requests", reqID));
 
 }
 
-async function deleteRequest(from, to, amount, type, docID, reqID){
+async function deleteRequest(from, to, amount, type, docID, reqID) {
     await addTransaction(to, amount, to, type, true, from, 2)
     await changeTransactionStatus(from, docID, 1)
     await deleteDoc(doc(db, "users", to, "requests", reqID));
 
 }
 
-async function getRequest(id){
+async function getRequest(id) {
     return await getDocs(query((collection(db, "users", id, "requests")), orderBy('date', 'asc')))
 }
 
-async function addTransaction(id, amount, to, type, recieved, from, status){
+async function addTransaction(id, amount, to, type, recieved, from, status) {
     //Payment Type
     // 0 - DuckBills
     // 1 - Dining Dollars
@@ -95,70 +94,101 @@ async function addTransaction(id, amount, to, type, recieved, from, status){
 
 }
 
-async function getTransactions(id){
+async function getTransactions(id) {
     return await getDocs(query((collection(db, "users", id, "transactions")), orderBy('date', 'desc')))
 }
 
-async function getTransaction(id, docID){
+async function getTransaction(id, docID) {
 
     return await getDoc(doc(db, "users", id, "transactions", docID));
 
 }
 
-async function deleteTransaction(id, docID){
+async function deleteTransaction(id, docID) {
     await deleteDoc(doc(db, "users", id, "transactions", docID));
 }
 
-async function changeTransactionStatus(id, docID, status){
+async function changeTransactionStatus(id, docID, status) {
     await updateDoc(doc(db, "users", id, "transactions", docID), {
         status: status
     });
 }
 
-async function setQuickPay(id){
-
+async function setQuickPay(id) {
     const docRef = collection(db, "users", id, "quickpay");
-    if((await getQuickPay(id)).size < 4){
+    if ((await getQuickPay(id)).size < 4) {
         await setDoc(doc(docRef), {id: id});
     }
 }
 
-async function getQuickPay(id){
+async function getQuickPay(id) {
     return await getDocs(collection(db, "users", id, "quickpay"));
 }
 
-async function activeUser(id){
-
-    const docRef = doc(db, "users", id);
-    const docSnap = await getDoc(docRef);
-
-
-
+async function removeQuickPay(id, docID) {
+    await deleteDoc(doc(db, "users", id, "quickpay", docID));
 }
 
-async function getFriends(id){
+
+async function activeUser(id) {
+    const docRef = doc(db, "users", id);
+    const docSnap = await getDoc(docRef);
+}
+
+async function getFriends(id) {
     return await getDocs(collection(db, "users", id, "friends"));
 }
 
-async function addFriend(id, friendID){
+async function addFriend(id, friendID) {
     const docRef = collection(db, "users", id, "friends");
-        await setDoc(doc(docRef), {id: friendID});
+    await setDoc(doc(docRef), {id: friendID});
 }
 
-async function isFriend(id){
-    await getFriends(id)
+async function removeFriend(id, docID) {
+    await deleteDoc(doc(db, "users", id, "friends", docID));
 }
 
-async function createUser(id, name){
+
+async function createUser(id, name) {
     await setDoc(doc(usersRef, id), {
         ID: id, name: name,
-        friends: [] });
+        friends: []
+    });
 }
 
 async function getUser(id) {
 
-    const docRef = doc(db, "users",  id);
+    const docRef = doc(db, "users", id);
 
-    return (await getDoc(docRef)).data().name.toString()
+    return (await getDoc(docRef)).data().name.toString();
 }
-export {getSingleRequest, changeTransactionStatus, getTransaction, deleteTransaction, getUser, addFriend, addTransaction, getTransactions, setQuickPay, getQuickPay, getFriends, createRequest, getRequest, acceptRequest, deleteRequest};
+async function getUserColor(id) {
+
+    const docRef = doc(db, "users", id);
+
+    return (await getDoc(docRef)).data().color.toString();
+}
+
+
+
+
+export {
+    getSingleRequest,
+    removeQuickPay,
+    removeFriend,
+    changeTransactionStatus,
+    getTransaction,
+    deleteTransaction,
+    getUser,
+    addFriend,
+    addTransaction,
+    getTransactions,
+    setQuickPay,
+    getQuickPay,
+    getFriends,
+    createRequest,
+    getRequest,
+    acceptRequest,
+    deleteRequest,
+    getUserColor
+};

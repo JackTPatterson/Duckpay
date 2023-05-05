@@ -18,14 +18,24 @@ import {SafeAreaView} from "react-navigation";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import Svg, {Path} from "react-native-svg";
 import primaryColor from "../Constants";
-import {addFriend, addTransaction, getQuickPay, createRequest, getUser} from '../Scripts/HandleDB';
+import {
+    addFriend,
+    addTransaction,
+    getQuickPay,
+    createRequest,
+    getUser,
+    getFriends,
+    getUserColor
+} from '../Scripts/HandleDB';
 import Toast from "react-native-toast-message";
 import {UserBottomSheet} from "../components/UserBottomSheet";
 import {GetType} from "../Scripts/GetType";
+import LoadingPage from "../components/ActivityIndicator";
 
 export const Keypad = ({navigation, route}) => {
 
     const [digit, setKey] = useState("");
+
 
     const [data, setData] = useState(null);
 
@@ -37,16 +47,26 @@ export const Keypad = ({navigation, route}) => {
     const animation1 = useRef(null);
     const animation2 = useRef(null);
 
-    const [success, setSuccess] = useState(false);
+    const [success, setSuccess] = useState(0);
 
     const [type, setType] = useState(0);
 
     const [name, setName] = useState(null);
+    const [color, setColor] = useState(null);
+
+    const [isFriend, setIsFriend] = useState(true);
+
 
     useEffect(() => {
         getUser(route.params.data).then(res => {
             setName(res);
+        }).then(()=>{
+            getUserColor(route.params.data).then((res)=>{
+                setColor(res)
+
+            })
         })
+
     })
 
     let fontLoaded = useFonts({
@@ -67,8 +87,8 @@ export const Keypad = ({navigation, route}) => {
     }
 
 
-    if (!fontLoaded) {
-        return <></>
+    if (!fontLoaded || !name || color === null || type === null) {
+        return <LoadingPage/>
     } else
         return (
             <View>
@@ -100,7 +120,7 @@ export const Keypad = ({navigation, route}) => {
                                         borderRadius: '100%',
                                         justifyContent: "center",
                                         alignItems: "center",
-                                        backgroundColor: primaryColor,
+                                        backgroundColor: color,
                                     }}
                                 >
                                     {name !== null ?
@@ -320,7 +340,7 @@ export const Keypad = ({navigation, route}) => {
                             <View
                                 style={{
                                     flexDirection: "row",
-                                    marginTop: 10,
+                                    marginTop: 0,
                                     justifyContent: "space-between",
                                 }}
                             >
@@ -373,7 +393,7 @@ export const Keypad = ({navigation, route}) => {
                             <View
                                 style={{
                                     flexDirection: "row",
-                                    marginTop: 10,
+                                    marginTop: 0,
                                     justifyContent: "space-between",
                                 }}
                             >
@@ -426,7 +446,7 @@ export const Keypad = ({navigation, route}) => {
                             <View
                                 style={{
                                     flexDirection: "row",
-                                    marginTop: 10,
+                                    marginTop: 0,
                                     justifyContent: "space-between",
                                 }}
                             >
@@ -569,7 +589,7 @@ export const Keypad = ({navigation, route}) => {
                                 flexDirection: "row",
                                 width: '100%',
                                 alignItems: 'center',
-                                marginBottom: 30,
+                                marginBottom: 20,
                                 justifyContent: 'space-between'
                             }}>
                                 <Text style={{
@@ -592,24 +612,59 @@ export const Keypad = ({navigation, route}) => {
                                     <Ionicons name={"close-outline"} size={27}/>
                                 </TouchableOpacity>
                             </View>
-                            <Text
-                                style={{fontSize: 20, fontFamily: 'Sora-Regular', textAlign: 'center', marginTop: 20}}>You
-                                are are about to send</Text>
-                            <Text style={{
-                                fontSize: 42,
-                                fontFamily: 'Sora-SemiBold',
-                                textAlign: 'center',
-                                marginTop: 20
-                            }}>{type === 2 ? "": "$"}{digit}</Text>
-                            <GetType center type={type}/>
-                            {name !== null ?
-                            <Text style={{
-                                fontSize: 20,
-                                fontFamily: 'Sora-Regular',
-                                textAlign: 'center',
-                                marginVertical: 20
-                            }}> to {name.toString()}</Text> : <></>
-                            }
+                            <View style={{
+                                flex: 1,
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                gap: 10,
+                                borderRadius: '100%',
+                                marginRight: 10
+                            }}>
+                                <TouchableOpacity onPress={() => {
+                                    Haptics.selectionAsync()
+                                    panelRef4.current?.togglePanel();
+                                }}>
+                                    <View
+                                        style={{
+                                            width: 50,
+                                            height: 50,
+                                            borderRadius: '100%',
+                                            justifyContent: "center",
+                                            alignItems: "center",
+                                            backgroundColor: color,
+                                        }}
+                                    >
+                                        {name !== null ?
+                                            <Text style={{
+                                                fontFamily: "Sora-SemiBold",
+                                                fontSize: 16,
+                                                color: "white",
+                                            }}>{name.split(" ")[0].slice(0, 1)}{name.split(" ")[1].slice(0, 1)}</Text>
+                                            : <></>
+                                        }
+                                    </View>
+                                </TouchableOpacity>
+                                {name !== null ?
+                                <Text style={{
+                                    textAlign: "left",
+                                    fontFamily: 'Sora-Regular',
+                                    fontSize: 20,
+                                }}>{name.toString()}</Text> : <></> }
+                            </View>
+
+                            <View style={{flexDirection: 'row', justifyContent: "space-between", marginTop: 30, alignItems: "center", width: "100%"}}>
+
+
+                                        <Text style={{fontFamily: 'Sora-SemiBold', fontSize: 24}}>${digit}</Text>
+
+
+                                <Text
+                                    style={{fontSize: 16, textAlign: 'left', fontFamily: 'Sora-SemiBold'}}>{type === 0 ? "DuckBills" : type === 0 ? "Dining Dollars" : "Swipes"}</Text>
+
+
+
+                            </View>
+
                             <View style={{
                                 flexDirection: 'row',
                                 marginBottom: 20,
@@ -622,8 +677,7 @@ export const Keypad = ({navigation, route}) => {
                                     navigation.push('Home');
                                 }} style={{
                                     flex: 1,
-                                    borderWidth: 1,
-                                    borderColor: 'black',
+                                    backgroundColor: '#f9f9f9',
                                     padding: 15,
                                     borderRadius: '100%',
                                     marginTop: 10,
@@ -643,6 +697,9 @@ export const Keypad = ({navigation, route}) => {
                                 }} style={{
                                     flex: 1,
                                     borderWidth: 1,
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
                                     borderColor: primaryColor,
                                     backgroundColor: primaryColor,
                                     padding: 15,
@@ -653,8 +710,16 @@ export const Keypad = ({navigation, route}) => {
                                         textAlign: "center",
                                         fontFamily: 'Sora-Regular',
                                         fontSize: 20,
+                                        marginRight: 10,
                                         color: 'white'
-                                    }}>Confirm</Text>
+                                    }}>Send</Text>
+                                    <Svg style={{transform: [{ rotate: '-45deg'}]}} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="white" className="w-6 h-6">
+                                        <Path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
+                                    </Svg>
+
+
+
+
                                 </TouchableOpacity>
                             </View>
                         </View>
@@ -775,15 +840,16 @@ export const Keypad = ({navigation, route}) => {
                         animationDuration={500}
                         animation={Easing.inOut(Easing.poly(5))}
                         sliderMaxHeight={Dimensions.get('window').height * .8}
-                        isOpen={false}
+                        isOpen={success !== 0}
                         onOpen={() => {
+                            animation2.current?.play()
                             addTransaction("20011188", digit, route.params.data, type, false, "20011188", 0).then(
                                 (res) => {
                                     createRequest("20011188", "20011188", digit, type, route.params.message, res).then(
                                         () => animation2.current?.play()
-                                    )
+                                    ).then(()=>setSuccess(1)).catch(()=>setSuccess(2))
                                 }
-                            )
+                            ).then(()=>setSuccess(1)).catch(()=>setSuccess(2))
                         }}
 
                         onClose={() => {
@@ -813,8 +879,8 @@ export const Keypad = ({navigation, route}) => {
                                             height: 150
                                         }}
                                         speed={.9}
-                                        loop={false}
-                                        source={require('../assets/complete.json')}
+                                        loop={success === 0}
+                                        source={success === 0 ? require('../assets/loading.json') : success === 1 ? require('../assets/complete.json') : require('../assets/error.json')}
                                     />
 
                                     <Text style={{
@@ -822,7 +888,7 @@ export const Keypad = ({navigation, route}) => {
                                         marginTop: 20,
                                         fontFamily: 'Sora-Regular',
                                         textAlign: 'center'
-                                    }}>Payment Sent</Text>
+                                    }}>{success === 0 ? "Sending..." : success === 1 ? "Sent Payment" : "Send Failed" }</Text>
 
                                     <View style={{
                                         flexDirection: 'row',
@@ -840,15 +906,8 @@ export const Keypad = ({navigation, route}) => {
                                         <GetType type={type}/>
 
                                     </View>
-                                    <View style={{
-                                        height: 1,
-                                        borderColor: '#f1f1f1',
-                                        width: '100%',
-                                        position: 'relative',
-                                        borderWidth: .2,
-                                        marginTop: 10
-                                    }}>
-                                    </View>
+                                    {success === 1 ?
+                                    <View style={{width: '100%'}}>
                                     <View style={{
                                         flexDirection: 'row',
                                         justifyContent: "space-between",
@@ -874,7 +933,7 @@ export const Keypad = ({navigation, route}) => {
                                     }}>
 
                                         <Text style={{fontFamily: 'Sora-Regular', fontSize: 16, color: 'gray'}}>Date
-                                            Transfered</Text>
+                                            Transferred</Text>
                                         <Text style={{fontFamily: 'Sora-Regular', fontSize: 16}}>{
                                             new Date(Date.now()).toLocaleString().split(', ')[0]
                                         }</Text>
@@ -889,13 +948,15 @@ export const Keypad = ({navigation, route}) => {
                                         paddingBottom: 50
                                     }}>
                                         <Text style={{fontFamily: 'Sora-Regular', fontSize: 16, color: 'gray'}}>Time
-                                            Transfered</Text>
+                                            Transferred</Text>
                                         <Text style={{fontFamily: 'Sora-Regular', fontSize: 16}}>{
                                             new Date(Date.now()).toLocaleString().split(', ')[1]
 
                                         }</Text>
 
                                     </View>
+                                    </View> : <></>
+                                    }
                                     <TouchableOpacity onPress={() => {
                                         navigation.push("Home");
 
@@ -925,7 +986,9 @@ export const Keypad = ({navigation, route}) => {
                         </View>
 
                     </BottomSheet>
-                    <UserBottomSheet name={name} toast={Toast} friendID={route.params.data} panel={panelRef4}/>
+
+                    {/*TODO: Rename friendID to userID */}
+                    <UserBottomSheet name={name} toast={Toast} friendID={route.params.data} docID={route.params.docID} panel={panelRef4}/>
                 </SafeAreaView>
             </View>
         );

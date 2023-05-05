@@ -75,7 +75,7 @@ export const Message = ({navigation, route}) => {
                         <Text style={{fontFamily: 'Sora-SemiBold', fontSize: 20}}>Message</Text>
                         <Ionicons style={{color: 'white'}} name={"arrow-back-outline"} size={36}/>
                     </View>
-                    <View style={{flexDirection: 'row', borderWidth: 1, borderColor: '#aaacae', borderRadius: 15, paddingHorizontal: 10, paddingVertical: 16}}>
+                    <View style={{flexDirection: 'row', alignItems: 'center', backgroundColor: '#f9f9f9', borderRadius: 30, paddingHorizontal: 16, paddingVertical: 16}}>
                             <TextInput maxLength={255} onChangeText={(val)=>setMessage(val)} placeholder="Write a Message" style={{fontSize: 15, fontFamily: 'Sora-Regular', width: '100%'}}/>
                     </View>
                     <View style={{flexDirection: "row", justifyContent: 'space-between', marginTop: 10}}>

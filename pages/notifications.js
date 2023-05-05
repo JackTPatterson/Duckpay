@@ -20,35 +20,51 @@ import * as React from "react";
 import {SafeAreaView} from "react-navigation";
 import {useFonts} from "expo-font";
 import {TransactionItem, RequestItem} from "../components/TransactionItem";
-import {useCallback, useEffect, useState} from "react";
+import {useCallback, useEffect, useRef, useState} from "react";
 import primaryColor from "../Constants";
 import BottomSheet from "react-native-simple-bottom-sheet";
 import {timeConverter} from "../Scripts/timeconverter";
 import {NavigationContainer} from "@react-navigation/native";
 import {TransactionDetail} from "./TransactionDetail";
 import {createStackNavigator} from "@react-navigation/stack";
-import {forFade} from "../Scripts/home/interpolators";
 import Toast from "react-native-toast-message";
 import {toastConfig} from "../Scripts/toast";
 import {GetType} from "../Scripts/GetType";
+import ActivityIndicator from "../components/ActivityIndicator";
+import LottieView from "lottie-react-native";
 
 export const NotificationsComp = ({navigation}) => {
-    const [data, setData] = useState(null)
+    const [data, setData] = useState(null);
+    const [gotData, setGotData] = useState(false);
+
     const [today, setToday] = useState(null);
 
     const [request, setRequests] = useState(null);
+    const [gotRequests, setGotRequests] = useState(false);
+
     const panelRef = React.useRef(null);
 
     const [currentData, setCurrentData] = useState({});
 
+    const animation = useRef(null);
+
+
 
     useEffect(() => {
+
         if (request == null) {
             getRequestsList("20011188")
         }
         if (data == null) {
             getTransactionsList("20011188")
         }
+
+        animation.current?.play();
+
+        console.log(gotData, gotRequests)
+
+
+
     })
 
     function getTransactionsList(id) {
@@ -66,9 +82,11 @@ export const NotificationsComp = ({navigation}) => {
                     }
                 }
             )
+            setGotData(true);
             setData(lst)
             setToday(todayLst);
         })
+
 
     }
 
@@ -80,6 +98,7 @@ export const NotificationsComp = ({navigation}) => {
                     lst.push(data)
                 }
             )
+            setGotRequests(true)
             setRequests(lst)
         })
     }
@@ -92,6 +111,8 @@ export const NotificationsComp = ({navigation}) => {
         getRequestsList("20011188")
         getTransactionsList("20011188")
 
+
+
         setTimeout(() => {
             setRefreshing(false);
         }, 2000);
@@ -103,103 +124,179 @@ export const NotificationsComp = ({navigation}) => {
         "Sora-SemiBold": require("../assets/fonts/Sora-SemiBold.ttf"),
     });
 
-    if (!fontLoaded) {
-        return <></>
-    } else
+    if (!fontLoaded || !gotData || !gotRequests)
+        return <ActivityIndicator/>
+    else if(data != null) {
+        if (request.length > 0 || data.length > 0) {
 
-        return (
-            <View>
+            return (
+                <View>
+                    <SafeAreaView style={styles.body}>
+
+                        <View>
+                            <Text style={{
+                                fontFamily: 'Sora-SemiBold',
+                                fontSize: 24,
+                                marginBottom: 20,
+                                zIndex: 1
+                            }}>Activity</Text>
+                        </View>
+                        <ScrollView horizontal={false} refreshControl={
+                            <RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>
+                        }>
+                            {request != null ? (
+                                request.map(dt => {
+                                    if (dt.data().amount !== undefined)
+                                        return <RequestItem fromID={dt.data().from} data={setCurrentData}
+                                                            transactionID={dt.data().transactionID}
+                                                            panel={panelRef} message={dt.data().message} docID={dt.id}
+                                                            from={dt.data().from} id={dt.id} change={dt.data().amount}
+                                                            name={dt.data().from} type={dt.data().type}/>
+                                })
+                            ) : (
+                                <></>
+                            )}
+                            {today !== null && today.length > 0 ?
+                                <Text style={{
+                                    fontSize: 20,
+                                    fontFamily: 'Sora-Regular',
+                                    marginBottom: 10
+                                }}>Today</Text> : <></>
+                            }
+                            {today !== null && today.length > 0 ? (
+                                today.map(dt => {
+                                    let statusText = "";
+                                    if (dt.data().status === 0) {
+                                        statusText = "Pending"
+                                    }
+                                    if (dt.data().status === 1) {
+                                        statusText = "Accepted"
+                                    }
+                                    if (dt.data().status === 2) {
+                                        statusText = "Rejected"
+                                    }
+
+                                    if (dt.data().amount !== undefined)
+                                        return <TransactionItem nav={navigation} docID={dt.id} status={statusText}
+                                                                info={timeConverter(dt.data().date.seconds)}
+                                                                change={dt.data().recieved ? "+$" + dt.data().amount : "-$" + dt.data().amount}
+                                                                name={dt.data().to}/>
+                                })
+                            ) : (
+                                <></>
+                            )}
+                            {today !== null && today.length > 0 && data.length > 0 ?
+                                <Text style={{
+                                    fontSize: 20,
+                                    fontFamily: 'Sora-Regular',
+                                    marginBottom: 10
+                                }}>All Transactions</Text> : <></>
+                            }
+                            {data != null ? (
+                                data.map(dt => {
+                                    let statusText = "";
+                                    if (dt.data().status === 0) {
+                                        statusText = "Pending"
+                                    }
+                                    if (dt.data().status === 1) {
+                                        statusText = "Accepted"
+                                    }
+                                    if (dt.data().status === 2) {
+                                        statusText = "Rejected"
+                                    }
+
+                                    if (dt.data().amount !== undefined)
+                                        return <TransactionItem nav={navigation} docID={dt.id} status={statusText}
+                                                                info={timeConverter(dt.data().date.seconds)}
+                                                                change={dt.data().recieved ? "+$" + dt.data().amount : "-$" + dt.data().amount}
+                                                                name={dt.data().from}/>
+                                })
+                            ) : (
+                                <></>
+                            )}
+                        </ScrollView>
+                    </SafeAreaView>
+                    <Accept type={currentData.type} panel={panelRef} reloadActionOne={getRequestsList}
+                            reloadActionTwo={getTransactionsList}
+                            transactionID={currentData.transactionID} amount={currentData.amount}
+                            name={currentData.name} fromID={currentData.fromID} message={currentData.msg}
+                            docID={currentData.docID}/>
+                    <Toast config={toastConfig}/>
+                </View>
+            );
+        }
+        else{
+            return (
                 <SafeAreaView style={styles.body}>
 
                     <View>
                         <Text style={{
                             fontFamily: 'Sora-SemiBold',
                             fontSize: 24,
-                            marginBottom: 20,
+                            marginBottom: 0,
                             zIndex: 1
                         }}>Activity</Text>
                     </View>
-                    <ScrollView horizontal={false} refreshControl={
-                        <RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>
-                    }>
-                        {request != null ? (
-                            request.map(dt => {
-                                if (dt.data().amount !== undefined)
-                                    return <RequestItem fromID={dt.data().from} data={setCurrentData} transactionID={dt.data().transactionID}
-                                                        panel={panelRef} message={dt.data().message} docID={dt.id}
-                                                        from={dt.data().from} id={dt.id} change={dt.data().amount}
-                                                        name={dt.data().from} type={dt.data().type}/>
-                            })
-                        ) : (
-                            <></>
-                        )}
-                        {today !== null && today.length > 0 ?
-                            <Text style={{
-                                fontSize: 20,
-                                fontFamily: 'Sora-Regular',
-                                marginBottom: 10
-                            }}>Today</Text> : <></>
-                        }
-                        {today !== null && today.length > 0 ? (
-                            today.map(dt => {
-                                let statusText = "";
-                                if (dt.data().status === 0) {
-                                    statusText = "Pending"
-                                }
-                                if (dt.data().status === 1) {
-                                    statusText = "Accepted"
-                                }
-                                if (dt.data().status === 2) {
-                                    statusText = "Rejected"
-                                }
+                    <View style={{
+                        height: "100%",
+                        flexDirection: 'column',
+                        justifyContent: 'flex-start',
+                        alignItems: 'center',
+                    }}>
+                        <Text style={{
+                            fontFamily: 'Sora-SemiBold',
+                            fontSize: 24,
+                            marginTop: 50,
+                            marginBottom: 0,
+                            zIndex: 1
+                        }}>Nothing To See Here</Text>
+                        <Text style={{
+                            fontFamily: 'Sora-Regular',
+                            fontSize: 16,
+                            textAlign: 'center',
+                            maxWidth: 300,
+                            marginVertical: 10,
+                            marginBottom: 50,
+                            zIndex: 1
+                        }}>When a transaction is made, it will appear here</Text>
+                        <LottieView
+                            ref={animation}
+                            style={{
 
-                                if (dt.data().amount !== undefined)
-                                    return <TransactionItem nav={navigation} docID={dt.id} status={statusText}
-                                                            info={timeConverter(dt.data().date.seconds)}
-                                                            change={dt.data().recieved ? "+$" + dt.data().amount : "-$" + dt.data().amount}
-                                                            name={dt.data().to}/>
-                            })
-                        ) : (
-                            <></>
-                        )}
-                        {today !== null && today.length > 0 && data.length > 0 ?
-                            <Text style={{
-                                fontSize: 20,
-                                fontFamily: 'Sora-Regular',
-                                marginBottom: 10
-                            }}>All Transactions</Text> : <></>
-                        }
-                        {data != null ? (
-                            data.map(dt => {
-                                console.log(dt.data().from)
-                                let statusText = "";
-                                if (dt.data().status === 0) {
-                                    statusText = "Pending"
-                                }
-                                if (dt.data().status === 1) {
-                                    statusText = "Accepted"
-                                }
-                                if (dt.data().status === 2) {
-                                    statusText = "Rejected"
-                                }
+                                width: 350,
+                                height: 350
+                            }}
+                            speed={1}
+                            loop={true}
+                            source={require('../assets/empty.json')}/>
+                        <TouchableOpacity onPress={() => {
+                            onRefresh();
+                            Haptics.selectionAsync();
 
-                                if (dt.data().amount !== undefined)
-                                    return <TransactionItem nav={navigation} docID={dt.id} status={statusText}
-                                                            info={timeConverter(dt.data().date.seconds)}
-                                                            change={dt.data().recieved ? "+$" + dt.data().amount : "-$" + dt.data().amount}
-                                                            name={dt.data().from}/>
-                            })
-                        ) : (
-                            <></>
-                        )}
-                    </ScrollView>
-                </SafeAreaView>
-                <Accept type={currentData.type} panel={panelRef} reloadActionOne={getRequestsList} reloadActionTwo={getTransactionsList}
-                        transactionID={currentData.transactionID} amount={currentData.amount}
-                        name={currentData.name} fromID={currentData.fromID} message={currentData.msg} docID={currentData.docID}/>
-                <Toast config={toastConfig}/>
-            </View>
-        );
+
+                        }} style={{
+
+                            backgroundColor: '#f9f9f9',
+                            paddingVertical: 15,
+                            paddingHorizontal: 30,
+                            borderRadius: '100%',
+                            marginTop: 20,
+                            marginRight: 10
+                        }}>
+                            <Text style={{
+                                textAlign: "center",
+                                fontFamily: 'Sora-Regular',
+                                fontSize: 20,
+                            }}>Reload</Text>
+                        </TouchableOpacity>
+                    </View>
+
+
+                </SafeAreaView>)
+
+        }
+    }
+
 }
 
 function Accept(props) {
@@ -253,16 +350,7 @@ function Accept(props) {
                             </View>
                         </View>
 
-                        {/*<LottieView*/}
-                        {/*    ref={animation}*/}
-                        {/*    style={{*/}
-                        {/*        width: 150,*/}
-                        {/*        height: 150*/}
-                        {/*    }}*/}
-                        {/*    speed={.9}*/}
-                        {/*    loop={false}*/}
-                        {/*    source={require('../assets/complete.json')}*/}
-                        {/*/>*/}
+
 
                         <Text style={{
                             fontSize: 20,
@@ -322,6 +410,37 @@ function Accept(props) {
                                 marginTop: 10
                             }}>{props.message}</Text>
 
+
+                        </View>
+                        <View style={{flexDirection: 'row', justifyContent: "space-between", marginTop: 30, alignItems: "flex-end", width: "100%"}}>
+
+                            <Text style={{fontFamily: 'Sora-Regular', fontSize: 16, color: 'gray'}}>Sent From</Text> : ""
+
+                            <Text style={{fontFamily: 'Sora-Regular', fontSize: 16}}>{name}</Text>
+
+                        </View>
+                        <View style={{flexDirection: 'row', justifyContent: "space-between", marginTop: 30, alignItems: "flex-end", width: "100%"}}>
+
+                            <Text style={{fontFamily: 'Sora-Regular', fontSize: 16, color: 'gray'}}>Date Transferred</Text>
+                            <Text style={{fontFamily: 'Sora-Regular', fontSize: 16}}>
+                                {
+                                    data !== null ?
+                                        new Date(data.data().date.seconds*1000).toLocaleString().split(', ')[0]
+                                        : ""
+                                }
+                            </Text>
+
+                        </View>
+                        <View style={{flexDirection: 'row', justifyContent: "space-between", marginTop: 30, alignItems: "flex-end", width: "100%", paddingBottom: 50}}>
+                            <Text style={{fontFamily: 'Sora-Regular', fontSize: 16, color: 'gray'}}>Time Transfered</Text>
+                            <Text style={{fontFamily: 'Sora-Regular', fontSize: 16}}>
+                                {
+                                    data !== null ?
+                                        new Date(data.data().date.seconds*1000).toLocaleString().split(', ')[1]
+                                        : ""
+
+
+                                }</Text>
 
                         </View>
 
@@ -418,7 +537,6 @@ export function Notifications() {
                 screenOptions={{
                     headerShown: false,
                     useNativeDriver: false,
-                    cardStyleInterpolator: forFade,
                 }}
                 initialRouteName="Notifications">
                 <Stack.Screen name="Notifications" component={NotificationsComp}/>
