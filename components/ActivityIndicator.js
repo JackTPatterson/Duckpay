@@ -20,7 +20,7 @@ function LoadingPage () {
                 }}
                 speed={1}
                 loop={true}
-                source={require('../assets/pageloading.json')}
+                source={require('../assets/loading.json')}
             />
 
         </View>

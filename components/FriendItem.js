@@ -1,10 +1,11 @@
 import {Text, TouchableOpacity, View} from "react-native";
 import * as React from "react";
 import primaryColor from "../Constants";
-import {getUser, getUserColor} from "../Scripts/HandleDB";
+import {acceptRequest, deleteRequest, getUser, getUserColor} from "../Scripts/HandleDB";
 import {useEffect, useState} from "react";
 import * as Haptics from "expo-haptics";
-export function UserBox(props){
+
+function FriendItem(props){
 
 
     const [name, setName] = useState("ALoading AName");
@@ -34,12 +35,7 @@ export function UserBox(props){
     catch{}
 
     return (
-        <TouchableOpacity send onLongPress={()=>{
-            if(!props.send) {
-                props.panel.current?.togglePanel();
-                Haptics.selectionAsync().then();
-            }
-        }} onPress={()=>{
+        <TouchableOpacity onPress={()=>{
             props.navigate.push("Keypad", {data: props.name, docID: props.docID})
             Haptics.selectionAsync().then();
 
@@ -49,44 +45,39 @@ export function UserBox(props){
             borderRadius: '20%',
 
         }}>
-            <View style={{flexDirection: 'column', alignItems: 'center'}}>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
                 <View style={{
-                    marginBottom: 10,
-                    backgroundColor: 'white',
+
                     borderRadius: '100%',
-                    flexDirection: 'column',
+
                 }}>
                     <View
                         style={{
-                            width: 70,
-                            height: 70,
+                            width: 50,
+                            height: 50,
                             borderRadius: '100%',
                             justifyContent: "center",
                             alignItems: "center",
-                            backgroundColor: color
-
-
+                            backgroundColor: color,
                         }}
                     >
                         <Text style={{
                             fontFamily: "Sora-SemiBold",
-                            fontSize: 26,
+                            fontSize: 20,
                             color: "white",
                         }}>{firstLetter}{lastLetter}</Text>
                     </View>
                 </View>
-                <View style={{}}>
-                    <Text style={{fontFamily: 'Sora-SemiBold', textAlign: 'center'}}>{name != null ? name.split(" ")[0] : ""}</Text>
-                    <Text style={{fontFamily: 'Sora-SemiBold', textAlign: 'center'}}>{name != null ? name.split(" ")[1] : ""}</Text>
-
+                <View style={{marginLeft: 10}}>
+                    <Text style={{fontFamily: 'Sora-SemiBold', fontSize: 16}}>{name}</Text>
                 </View>
             </View>
 
-
-
-
         </TouchableOpacity>
+
     )
 
 }
 
+
+export default FriendItem

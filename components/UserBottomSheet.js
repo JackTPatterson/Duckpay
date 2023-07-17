@@ -22,50 +22,80 @@ export function UserBottomSheet(props) {
     const [isQuickPay, setIsQuickPay] = useState(false);
     const [quickpayDocID, setQuickpayDocID] = useState(null);
 
-    //TODO: All this needs to be fixed
-    // Try adding more friends and run again
+    const [quickPayFull, setQuickPayFull] = useState(false);
 
-    useEffect(()=> {
-        getFriends("20011188").then(res => {
+    function getIsFriend(){
+
+        getFriends("20011188").then(res=>{
+            let lst = []
+            res.forEach(data=>{
+                lst.push(data.data().id)
+            })
+            if(lst.length > 0){
+                setIsFriend(true);
+            }
+            else{
+                setIsFriend(false);
+            }
+        })
+    }
+
+
+    function getIsQuickPay(){
+
+        getQuickPay("20011188").then(res => {
+            let len = []
+            let lst = []
             res.forEach(data => {
-                if(data.data().id === props.friendID){
-                    setIsFriend(true);
-                    console.log(true)
-                    return true
+                len.push(data.id)
+                if (data.data().id === props.friendID) {
+                    lst.push(data.id)
                 }
             })
-            return false
+
+            if(len.length >= 4){
+                setQuickPayFull(true);
+            }
+            else{
+                setQuickPayFull(false);
+            }
+
+
+            if(lst.length > 0){
+                setQuickpayDocID(lst[0])
+                setIsQuickPay(true)
+            }
+            else{
+                setIsQuickPay(false)
+            }
+
+
         })
 
-        if(quickpayDocID === "") {
-            getQuickPay("20011188").then(res => {
-                res.forEach(data => {
-                    if (data.data().id === props.friendID) {
-                        setIsQuickPay(true);
-                        setQuickpayDocID(data.id)
-                        console.log(true)
-                        return true
-                    }
-                })
-                setQuickpayDocID("")
-                return false
-            })
-        }
-    })
+    }
+
+
+
+
 
     return (
 
 
-        <BottomSheet
+            <BottomSheet
             animationDuration={500}
             animation={Easing.inOut(Easing.poly(5))}
             sliderMinHeight={-20}
             isOpen={false}
+            onOpen={()=>{
+                getIsFriend();
+                getIsQuickPay();
+            }}
             style={{
                 padding: 20,
                 height: 400,
                 flexDirection: "column",
                 justifyContent: "center",
+
             }}
             ref={(ref) => (props.panel.current = ref)}
         >
@@ -96,30 +126,45 @@ export function UserBottomSheet(props) {
                 </TouchableOpacity>
             </View>
             <TouchableOpacity onPress={() => {
-                Haptics.selectionAsync()
+                Haptics.selectionAsync().then()
                 if(!isFriend) {
                     addFriend("20011188", props.friendID).then(()=>{
                         props.toast.show({
-                            type: 'tomatoToast',
-                            text1: 'Friend Added'
+                            type: 'successToast',
+                            text1: 'Friend Added',
+                            position: 'bottom',
+                            bottomOffset: 0
+
                         });
                     }).catch(()=>{
                         props.toast.show({
-                            type: 'tomatoToast',
-                            text1: 'Error Adding'
+                            type: 'failToast',
+                            text1: 'Error Adding',
+                            position: 'bottom',
+                            bottomOffset: 0
+
+
                         });
                     })
                 }
                 else {
                     removeFriend("20011188", props.docID).then(()=>{
                         props.toast.show({
-                            type: 'tomatoToast',
-                            text1: 'Friend Removed'
+                            type: 'successToast',
+                            text1: 'Friend Removed',
+                            position: 'bottom',
+                            bottomOffset: 0
+
+
                         });
                     }).catch(()=>{
                         props.toast.show({
-                            type: 'tomatoToast',
-                            text1: 'Error Removing Friend'
+                            type: 'failToast',
+                            text1: 'Error Removing Friend',
+                            position: 'bottom',
+                            bottomOffset: 0
+
+
                         });
                     })
                 }
@@ -164,30 +209,57 @@ export function UserBottomSheet(props) {
                 </View>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => {
-                Haptics.selectionAsync()
+                Haptics.selectionAsync().then()
                 if(!isQuickPay) {
-                    setQuickPay("20011188", props.friendID).then(()=>{
+                    if (!quickPayFull) {
+                        setQuickPay("20011188", props.friendID).then(() => {
+                            props.toast.show({
+                                type: 'successToast',
+                                text1: 'Added To Quick Pay',
+                                position: 'bottom',
+                                bottomOffset: 0
+
+
+                            });
+                        }).catch(() => {
+                            props.toast.show({
+                                type: 'failToast',
+                                text1: 'Error Adding',
+                                position: 'bottom',
+                                bottomOffset: 0
+
+
+
+                            });
+                        })
+                    }
+                    else {
                         props.toast.show({
-                            type: 'tomatoToast',
-                            text1: 'Added To Quick Pay'
+                            type: 'failToast',
+                            text1: 'Quick Pay Already Full',
+                            position: 'bottom',
+                            bottomOffset: 0
+
+
                         });
-                    }).catch(()=>{
-                        props.toast.show({
-                            type: 'tomatoToast',
-                            text1: 'Error Adding'
-                        });
-                    })
+                    }
                 }
                 else {
                     removeQuickPay("20011188", quickpayDocID).then(()=>{
                         props.toast.show({
-                            type: 'tomatoToast',
-                            text1: 'Removed From Quick Pay'
+                            type: 'successToast',
+                            text1: 'Removed From Quick Pay',
+                            position: 'bottom',
+                            bottomOffset: 0
+
+
                         });
                     }).catch(()=>{
                         props.toast.show({
-                            type: 'tomatoToast',
-                            text1: 'Error Removing'
+                            type: 'failToast',
+                            text1: 'Error Removing',
+                            position: 'bottom',
+                            bottomOffset: 0
                         });
                     })
                 }

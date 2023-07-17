@@ -14,16 +14,22 @@ import {getTransaction, getUser} from "../Scripts/HandleDB";
 import NumberTicker from "../components/TextTicker";
 import {GetType} from "../Scripts/GetType";
 import ActivityIndicator from "../components/ActivityIndicator";
+import {UNIXTODateConverter, UNIXToTime} from "../Scripts/UNIXTODateConverter";
 
 export const TransactionDetail = ({navigation, route}) => {
 
     const [data, setData] = useState(null);
+
+    const [time, setTime] = useState(null);
+
     const [name, setName] = useState(null);
 
 
     useEffect(()=> {
         getTransactionDetails(route.params.data)
-        console.log(route.params.data)
+        if(data !== null && time === null){
+            setTime(new Date(data.data().date.seconds * 1000))
+        }
     })
 
     function getTransactionDetails(id){
@@ -45,12 +51,14 @@ export const TransactionDetail = ({navigation, route}) => {
     }
 
 
+
+
     let fontLoaded = useFonts({
         "Sora-Regular": require("../assets/fonts/Sora-Regular.ttf"),
         "Sora-SemiBold": require("../assets/fonts/Sora-SemiBold.ttf"),
     });
 
-    if (!fontLoaded || data === null)
+    if (!fontLoaded || data === null || time === null)
         return <ActivityIndicator/>
     else
         return (
@@ -92,60 +100,48 @@ export const TransactionDetail = ({navigation, route}) => {
 
                                 <View style={{flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
                                     <View style={styles.success}>
-                                        {data !== null ?
                                         <Ionicons name={data.data().status === 0 ? "checkmark-outline" : "refresh-outline"} color={"white"} size={20}/>
-                                   : "" }
+
                                     </View>
-                                    {data !== null ?
-                                    <Text style={{textAlign: "center", marginTop: 4, fontFamily: "Sora-SemiBold"}}>Sent</Text> : "" }
+                                    <Text style={{textAlign: "center", marginTop: 4, fontFamily: "Sora-SemiBold"}}>Sent</Text>
                                 </View>
                                 <View style={{flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
-                                    {data !== null ?
 
                                     <View style={data.data().status === 1 || data.data().status === 2 ? styles.success : styles.pending}>
                                         <Ionicons name={data.data().status === 1 || data.data().status === 2 ? "checkmark-outline" : "reload-outline"} color={data.data().status === 1 || data.data().status === 2 ? "white" : "black"} size={20}/>
                                     </View>
-                                        : ""
-                                    }
-                                    {data !== null ?
-                                    <Text style={{textAlign: "center", marginTop: 4, fontFamily: "Sora-SemiBold"}}>Pending</Text> : "" }
+
+                                    <Text style={{textAlign: "center", marginTop: 4, fontFamily: "Sora-SemiBold"}}>Pending</Text>
                                 </View>
 
 
 
                                 <View style={{flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
-                                    {data !== null ?
                                     <View style={data.data().status === 1 ? styles.success : (data.data().status === 2 ? styles.rejected : styles.pending)}>
 
                                         <Ionicons name={data.data().status === 2 ? "close-outline" : data.data().status === 1 ? "checkmark-outline" : "reload-outline"} color={data.data().status === 1 || data.data().status === 2 ? "white" : "black"} size={20}/>
                                     </View>
 
-                                        : ""
-                                    }
-                                    {data !== null ?
+
                                     <Text style={{textAlign: "center", marginTop: 4, fontFamily: "Sora-SemiBold"}}>{data.data().status == 0 || data.data().status == 1 ? "Accepted" : "Rejected"}</Text>
-                                    : "" }
                                 </View>
                             </View>
                         </View>
                     </View>
                     <View style={{flexDirection: 'row', justifyContent: "space-between", marginTop: 30, alignItems: "flex-end", width: "100%"}}>
 
-                        {
-                            data !== null ?
-                        <Text style={{fontFamily: 'Sora-SemiBold', fontSize: 24}}>${data.data().amount}</Text> : ""
-                        }
-                        {data !== null ?
-                        <GetType type={data.data().type}/> : <></>
-                        }
+
+                        <Text style={{fontFamily: 'Sora-SemiBold', fontSize: 24}}>${data.data().amount}</Text>
+
+                        <GetType type={data.data().type}/>
+
 
                     </View>
                     <View style={{height: 1, borderColor: '#f1f1f1', width: '100%', position: 'relative', borderWidth: .2, marginTop: 10}}>
                     </View>
                     <View style={{flexDirection: 'row', justifyContent: "space-between", marginTop: 30, alignItems: "flex-end", width: "100%"}}>
                         {
-                            data !== null ?
-                        <Text style={{fontFamily: 'Sora-Regular', fontSize: 16, color: 'gray'}}>{data.data().recieved ? "Sent From" : "Sent To"}</Text> : ""
+                        <Text style={{fontFamily: 'Sora-Regular', fontSize: 16, color: 'gray'}}>{data.data().recieved ? "Sent From" : "Sent To"}</Text>
                         }
                         <Text style={{fontFamily: 'Sora-Regular', fontSize: 16}}>{name}</Text>
 
@@ -155,23 +151,19 @@ export const TransactionDetail = ({navigation, route}) => {
                         <Text style={{fontFamily: 'Sora-Regular', fontSize: 16, color: 'gray'}}>Date Transferred</Text>
                         <Text style={{fontFamily: 'Sora-Regular', fontSize: 16}}>
                             {
-                                data !== null ?
-                                    new Date(data.data().date.seconds*1000).toLocaleString().split(', ')[0]
-                                    : ""
+                                    UNIXTODateConverter(data.data().date.seconds)
                             }
                         </Text>
 
                     </View>
                     <View style={{flexDirection: 'row', justifyContent: "space-between", marginTop: 30, alignItems: "flex-end", width: "100%", paddingBottom: 50}}>
-                        <Text style={{fontFamily: 'Sora-Regular', fontSize: 16, color: 'gray'}}>Time Transfered</Text>
+                        <Text style={{fontFamily: 'Sora-Regular', fontSize: 16, color: 'gray'}}>Time Transferred</Text>
                         <Text style={{fontFamily: 'Sora-Regular', fontSize: 16}}>
                             {
-                                data !== null ?
-                                new Date(data.data().date.seconds*1000).toLocaleString().split(', ')[1]
-                                : ""
+                                UNIXToTime(time)
+                            }
 
-
-                        }</Text>
+                      </Text>
 
                     </View>
 
@@ -204,7 +196,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         height: 40,
         width: 40,
-        backgroundColor: '#42ff6e',
+        backgroundColor: '#6FD3B1',
     },
     pending: {
         flexDirection: 'row',

@@ -8,19 +8,36 @@ import * as React from "react";
 import Svg, {Path} from "react-native-svg";
 import {useFonts} from "expo-font";
 import primaryColor from "../Constants";
+import {useEffect, useState} from "react";
+import {getUser, getUserColor} from "../Scripts/HandleDB";
+import ActivityIndicator from "../components/ActivityIndicator";
 
 
 //export function Profile() {
 
 export function Profile() {
 
+    const [data, setData] = useState(null);
+
+    const [color, setColor] = useState(null);
+
+
+    useEffect(()=>{
+        getUser("20011188").then((res)=>{
+            setData(res)
+            getUserColor("20011188").then(col=>{
+                setColor(col)
+            })
+        })
+    })
+
     let fontLoaded = useFonts({
         "Sora-Regular": require("../assets/fonts/Sora-Regular.ttf"),
         "Sora-SemiBold": require("../assets/fonts/Sora-SemiBold.ttf"),
     });
 
-    if(!fontLoaded){
-        return <></>
+    if(!fontLoaded || !data || !color){
+        return <ActivityIndicator/>
     }
     else
     return (
@@ -42,21 +59,21 @@ export function Profile() {
                                     borderRadius: '100%',
                                     justifyContent: "center",
                                     alignItems: "center",
-                                    backgroundColor: primaryColor,
-
-
+                                    backgroundColor: color,
                                 }}
                             >
+                                {data !== null ?
                                 <Text style={{
                                     fontFamily: "Sora-SemiBold",
                                     fontSize: 36,
                                     color: "white",
-                                }}>JP</Text>
+                                }}>{data.toString().split(" ")[0].substring(0, 1)}{data.toString().split(" ")[1].substring(0, 1)}</Text> : <></>
+                                }
                             </View>
                         </View>
 
                     </View>
-                    <Text style={styles.name}>Jack Patterson</Text>
+                    <Text style={styles.name}>{data}</Text>
                     <Text style={styles.email}>fakeemail@gmail.com</Text>
                 </View>
             </View>

@@ -1,7 +1,7 @@
 import {
     AppLoading,
     Dimensions,
-    Easing,
+    Easing, FlatList,
     RefreshControl,
     ScrollView,
     StyleSheet,
@@ -23,7 +23,7 @@ import {TransactionItem, RequestItem} from "../components/TransactionItem";
 import {useCallback, useEffect, useRef, useState} from "react";
 import primaryColor from "../Constants";
 import BottomSheet from "react-native-simple-bottom-sheet";
-import {timeConverter} from "../Scripts/timeconverter";
+import {UNIXTODateConverter, UNIXToTime} from "../Scripts/UNIXTODateConverter";
 import {NavigationContainer} from "@react-navigation/native";
 import {TransactionDetail} from "./TransactionDetail";
 import {createStackNavigator} from "@react-navigation/stack";
@@ -32,6 +32,9 @@ import {toastConfig} from "../Scripts/toast";
 import {GetType} from "../Scripts/GetType";
 import ActivityIndicator from "../components/ActivityIndicator";
 import LottieView from "lottie-react-native";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import Svg, {Path} from "react-native-svg";
+import {MessageDetails} from "./MessageDetail";
 
 export const NotificationsComp = ({navigation}) => {
     const [data, setData] = useState(null);
@@ -52,18 +55,16 @@ export const NotificationsComp = ({navigation}) => {
 
     useEffect(() => {
 
+        animation.current?.play();
+
         if (request == null) {
             getRequestsList("20011188")
+            setGotRequests(true);
         }
         if (data == null) {
             getTransactionsList("20011188")
+            setGotData(true);
         }
-
-        animation.current?.play();
-
-        console.log(gotData, gotRequests)
-
-
 
     })
 
@@ -72,19 +73,23 @@ export const NotificationsComp = ({navigation}) => {
         getTransactions(id).then(res => {
             let todayLst = []
             let lst = []
+            // res.forEach((data) => {
+            //         if (new Date(data.data().date.seconds * 1000).toDateString() === new Date().toDateString()) {
+            //             todayLst.push(data);
+            //         } else {
+            //             if (lst.length < 10) {
+            //                 lst.push(data);
+            //             }
+            //         }
+            //     }
+            // )
+
             res.forEach((data) => {
-                    if (new Date(data.data().date.seconds * 1000).toDateString() === new Date().toDateString()) {
-                        todayLst.push(data);
-                    } else {
-                        if (lst.length < 10) {
-                            lst.push(data);
-                        }
-                    }
+                    lst.push(data);
                 }
             )
-            setGotData(true);
+
             setData(lst)
-            setToday(todayLst);
         })
 
 
@@ -112,7 +117,6 @@ export const NotificationsComp = ({navigation}) => {
         getTransactionsList("20011188")
 
 
-
         setTimeout(() => {
             setRefreshing(false);
         }, 2000);
@@ -126,8 +130,9 @@ export const NotificationsComp = ({navigation}) => {
 
     if (!fontLoaded || !gotData || !gotRequests)
         return <ActivityIndicator/>
-    else if(data != null) {
-        if (request.length > 0 || data.length > 0) {
+    else if (data != null) {
+
+            //Shows only if requests are sent
 
             return (
                 <View>
@@ -141,166 +146,177 @@ export const NotificationsComp = ({navigation}) => {
                                 zIndex: 1
                             }}>Activity</Text>
                         </View>
-                        <ScrollView horizontal={false} refreshControl={
-                            <RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>
-                        }>
-                            {request != null ? (
-                                request.map(dt => {
-                                    if (dt.data().amount !== undefined)
-                                        return <RequestItem fromID={dt.data().from} data={setCurrentData}
-                                                            transactionID={dt.data().transactionID}
-                                                            panel={panelRef} message={dt.data().message} docID={dt.id}
-                                                            from={dt.data().from} id={dt.id} change={dt.data().amount}
-                                                            name={dt.data().from} type={dt.data().type}/>
-                                })
-                            ) : (
-                                <></>
-                            )}
-                            {today !== null && today.length > 0 ?
-                                <Text style={{
-                                    fontSize: 20,
-                                    fontFamily: 'Sora-Regular',
-                                    marginBottom: 10
-                                }}>Today</Text> : <></>
-                            }
-                            {today !== null && today.length > 0 ? (
-                                today.map(dt => {
-                                    let statusText = "";
-                                    if (dt.data().status === 0) {
-                                        statusText = "Pending"
-                                    }
-                                    if (dt.data().status === 1) {
-                                        statusText = "Accepted"
-                                    }
-                                    if (dt.data().status === 2) {
-                                        statusText = "Rejected"
-                                    }
 
-                                    if (dt.data().amount !== undefined)
-                                        return <TransactionItem nav={navigation} docID={dt.id} status={statusText}
-                                                                info={timeConverter(dt.data().date.seconds)}
-                                                                change={dt.data().recieved ? "+$" + dt.data().amount : "-$" + dt.data().amount}
-                                                                name={dt.data().to}/>
-                                })
-                            ) : (
-                                <></>
-                            )}
-                            {today !== null && today.length > 0 && data.length > 0 ?
-                                <Text style={{
-                                    fontSize: 20,
-                                    fontFamily: 'Sora-Regular',
-                                    marginBottom: 10
-                                }}>All Transactions</Text> : <></>
-                            }
-                            {data != null ? (
-                                data.map(dt => {
-                                    let statusText = "";
-                                    if (dt.data().status === 0) {
-                                        statusText = "Pending"
-                                    }
-                                    if (dt.data().status === 1) {
-                                        statusText = "Accepted"
-                                    }
-                                    if (dt.data().status === 2) {
-                                        statusText = "Rejected"
-                                    }
+                             <View>
 
-                                    if (dt.data().amount !== undefined)
-                                        return <TransactionItem nav={navigation} docID={dt.id} status={statusText}
-                                                                info={timeConverter(dt.data().date.seconds)}
-                                                                change={dt.data().recieved ? "+$" + dt.data().amount : "-$" + dt.data().amount}
-                                                                name={dt.data().from}/>
-                                })
-                            ) : (
-                                <></>
-                            )}
-                        </ScrollView>
+
+                            <FlatList horizontal={true} snapToAlignment={"start"}
+                                      decelerationRate={"fast"}
+                                      snapToInterval={Dimensions.get("window").width}
+                                      showsHorizontalScrollIndicator={false} snapToStart={true} onMagicTap={()=>console.log(true)} data={request}
+                                      renderItem={({item}) => {
+                                          return <RequestItem fromID={item.data().from}
+                                                              data={setCurrentData}
+                                                              transactionID={item.data().transactionID}
+                                                              panel={panelRef}
+                                                              date={item.data().date.seconds}
+                                                              message={item.data().message} docID={item.id}
+                                                              from={item.data().from} id={item.id}
+                                                              change={item.data().amount}
+                                                              name={item.data().from}
+                                                              type={item.data().type}/>
+                                      }}>
+                            </FlatList>
+                            {request.length > 0 ?
+                            <Text style={{fontFamily: "Sora-SemiBold", textAlign: 'right'}}>{request.length}{request.length > 1  ? " Requests": " Request"}</Text>
+                            : <></>}
+                            <Text style={request.length > 0 ? {
+                                fontFamily: "Sora-Regular",
+                                marginTop: 10,
+                                marginBottom: 0,
+                                fontSize: 20
+                            } : {fontFamily: "Sora-Regular", marginBottom: 40, fontSize: 20}}>
+                                { data.length > 0 || request.length > 0 ? "All Transactions" : "" }
+                            </Text>
+                            <FlatList keyExtractor={(item, index) => index.toString()}
+                                      ListEmptyComponent={() => request.length > 0 ? <ReloadButton onRefresh={onRefresh}/> : <EmptyActivityList animation={animation}
+                                                                                   onRefresh={onRefresh}/>}
+                                      style={request.length > 0 ? {paddingTop: 20, height: '100%'} : {
+                                          marginTop: -20,
+                                          marginBottom: 50,
+                                          height: '100%'
+                                      }}
+                                      refreshControl={
+                                          <RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>} data={data}
+                                      renderItem={({item}) => {
+                                          let statusText = "";
+                                          if (item.data().status === 0) {
+                                              statusText = "Pending"
+                                          }
+                                          if (item.data().status === 1) {
+                                              statusText = "Accepted"
+                                          }
+                                          if (item.data().status === 2) {
+                                              statusText = "Rejected"
+                                          }
+
+                                          return <TransactionItem nav={navigation} docID={item.id} status={statusText}
+                                                                  info={UNIXTODateConverter(item.data().date.seconds)}
+                                                                  change={item.data().recieved ? "+$" + item.data().amount : "-$" + item.data().amount}
+                                                                  name={item.data().to}/>
+                                      }}>
+                            </FlatList>
+
+
+                        </View>
+
+
                     </SafeAreaView>
-                    <Accept type={currentData.type} panel={panelRef} reloadActionOne={getRequestsList}
+                    <Accept type={currentData.type} navigation={navigation} panel={panelRef}
+                            reloadActionOne={getRequestsList}
                             reloadActionTwo={getTransactionsList}
+                            date={UNIXTODateConverter(currentData.date)}
                             transactionID={currentData.transactionID} amount={currentData.amount}
                             name={currentData.name} fromID={currentData.fromID} message={currentData.msg}
-                            docID={currentData.docID}/>
+                            docID={currentData.docID}
+                            time={currentData.date}
+                    />
                     <Toast config={toastConfig}/>
                 </View>
             );
         }
-        else{
-            return (
-                <SafeAreaView style={styles.body}>
 
-                    <View>
-                        <Text style={{
-                            fontFamily: 'Sora-SemiBold',
-                            fontSize: 24,
-                            marginBottom: 0,
-                            zIndex: 1
-                        }}>Activity</Text>
-                    </View>
-                    <View style={{
-                        height: "100%",
-                        flexDirection: 'column',
-                        justifyContent: 'flex-start',
-                        alignItems: 'center',
-                    }}>
-                        <Text style={{
-                            fontFamily: 'Sora-SemiBold',
-                            fontSize: 24,
-                            marginTop: 50,
-                            marginBottom: 0,
-                            zIndex: 1
-                        }}>Nothing To See Here</Text>
-                        <Text style={{
-                            fontFamily: 'Sora-Regular',
-                            fontSize: 16,
-                            textAlign: 'center',
-                            maxWidth: 300,
-                            marginVertical: 10,
-                            marginBottom: 50,
-                            zIndex: 1
-                        }}>When a transaction is made, it will appear here</Text>
-                        <LottieView
-                            ref={animation}
-                            style={{
+}
 
-                                width: 350,
-                                height: 350
-                            }}
-                            speed={1}
-                            loop={true}
-                            source={require('../assets/empty.json')}/>
-                        <TouchableOpacity onPress={() => {
-                            onRefresh();
-                            Haptics.selectionAsync();
+function EmptyActivityList(props) {
+
+    useEffect(()=>{
+        props.animation.current?.play();
+    })
+
+    return (
+        <View style={{
+            height: "100%",
+            flexDirection: 'column',
+            justifyContent: 'flex-start',
+            alignItems: 'center',
+        }}>
+            <Text style={{
+                fontFamily: 'Sora-SemiBold',
+                fontSize: 24,
+                marginBottom: 0,
+                zIndex: 1
+            }}>Nothing To See Here</Text>
+            <Text style={{
+                fontFamily: 'Sora-Regular',
+                fontSize: 16,
+                textAlign: 'center',
+                maxWidth: 300,
+                marginVertical: 10,
+                marginBottom: 50,
+                zIndex: 1
+            }}>When a transaction is made, it will appear here</Text>
+            <LottieView
+                ref={props.animation}
+                style={{
+                    width: 350,
+                    height: 350
+                }}
+                speed={1}
+                loop={true}
+                source={require('../assets/empty.json')}/>
+
+        </View>
+    )
+}
+
+function ReloadButton(props){
+    return (
+        <View>
+            <Text style={{
+                fontFamily: 'Sora-SemiBold',
+                fontSize: 24,
+                marginBottom: 0,
+                zIndex: 1
+            }}>Nothing To See Here</Text>
+            <Text style={{
+                fontFamily: 'Sora-Regular',
+                fontSize: 16,
+                textAlign: 'left',
+                maxWidth: 300,
+                marginVertical: 10,
+                marginBottom: 20,
+                marginTop: 20,
+            }}>When a transaction is made, it will appear here</Text>
+            <TouchableOpacity onPress={() => {
+                props.onRefresh()
+                Haptics.selectionAsync();
 
 
-                        }} style={{
+            }} style={{
 
-                            backgroundColor: '#f9f9f9',
-                            paddingVertical: 15,
-                            paddingHorizontal: 30,
-                            borderRadius: '100%',
-                            marginTop: 20,
-                            marginRight: 10
-                        }}>
-                            <Text style={{
-                                textAlign: "center",
-                                fontFamily: 'Sora-Regular',
-                                fontSize: 20,
-                            }}>Reload</Text>
-                        </TouchableOpacity>
-                    </View>
+                backgroundColor: '#f9f9f9',
+                paddingVertical: 15,
+                paddingHorizontal: 30,
+                borderRadius: '100%',
+                marginRight: 10
+            }}>
+                <Text style={{
+                    textAlign: "center",
+                    fontFamily: 'Sora-Regular',
+                    fontSize: 20,
+                }}>Reload</Text>
+            </TouchableOpacity>
+        </View>
 
-
-                </SafeAreaView>)
-
-        }
-    }
-
+    )
 }
 
 function Accept(props) {
 
+    let currentDate = new Date(props.time * 1000).toLocaleTimeString();
+
+    let time = new Date(props.time * 1000);
 
 
     return (
@@ -317,205 +333,246 @@ function Accept(props) {
             }}
             ref={(ref) => (props.panel.current = ref)}
         >
-            <View style={{
-                flexDirection: "column",
-                justifyContent: "space-between",
-            }}>
-                <View>
-                    <View style={{flexDirection: 'column', justifyContent: 'center', alignItems: "center"}}>
-                        <View style={{
-                            marginBottom: 10,
-                            backgroundColor: 'white',
-                            borderRadius: '100%',
-                            flexDirection: 'column',
-                        }}>
-                            <View
-                                style={{
-                                    width: 100,
-                                    height: 100,
-                                    borderRadius: '100%',
-                                    justifyContent: "center",
-                                    alignItems: "center",
-                                    backgroundColor: primaryColor,
-                                }}
-                            >
-                                {props.name ?
-                                    <Text style={{
-                                        fontFamily: "Sora-SemiBold",
-                                        fontSize: 36,
-                                        color: "white",
-                                    }}>{props.name.toString().split(" ")[0].substring(0, 1)}{props.name.toString().split(" ")[1].substring(0, 1)}</Text> : <></>
-                                }
-
-                            </View>
-                        </View>
+            <View>
+                <View style={{
+                    flexDirection: "row",
+                    width: '100%',
+                    alignItems: 'center',
+                    marginBottom: 20,
+                    justifyContent: 'space-between'
+                }}>
+                    <Text style={{
+                        fontSize: 24,
+                        fontFamily: 'Sora-SemiBold',
+                        textAlign: 'center'
+                    }}>Accept Payment</Text>
 
 
-
-                        <Text style={{
-                            fontSize: 20,
-                            marginTop: 20,
-                            fontFamily: 'Sora-Regular',
-                            textAlign: 'center'
-                        }}>Incoming Transfer by</Text>
-
-                            <Text style={{
-                                fontSize: 24,
-                                marginTop: 10,
-                                fontFamily: 'Sora-SemiBold',
-                                textAlign: 'center'
-                            }}>{props.name}</Text>
-
-
-
-                        <View style={{
-                            flexDirection: 'row',
-                            justifyContent: "space-between",
-                            marginTop: 30,
-                            alignItems: "flex-end",
-                            width: "100%"
-                        }}>
-                            {props.amount != null ?
-                                <Text style={{
-                                    fontFamily: 'Sora-SemiBold',
-                                    fontSize: 36
-                                }}>{props.type === 2 ? "" : "$"}{props.amount.includes(".") || props.type === 2 ? props.amount : props.amount + ".00"}</Text>
-                                : <></>
-                            }
-                           <GetType type={props.type}/>
-
-                        </View>
-                        <View style={{
-                            height: 1,
-                            borderColor: '#f1f1f1',
-                            width: '100%',
-                            position: 'relative',
-                            borderWidth: .2,
-                            marginTop: 10
-                        }}>
-                        </View>
-                        <View style={{
-                            flexDirection: 'column',
-                            justifyContent: "flex-start",
-                            marginTop: 30,
-                            alignItems: "flex-start",
-                            width: "100%"
-                        }}>
-
-                            <Text style={{fontFamily: 'Sora-Regular', fontSize: 16, color: 'gray'}}>Message</Text>
-                            <Text style={{
-                                fontFamily: 'Sora-SemiBold',
-                                fontSize: 16,
-                                color: 'black',
-                                marginTop: 10
-                            }}>{props.message}</Text>
-
-
-                        </View>
-                        <View style={{flexDirection: 'row', justifyContent: "space-between", marginTop: 30, alignItems: "flex-end", width: "100%"}}>
-
-                            <Text style={{fontFamily: 'Sora-Regular', fontSize: 16, color: 'gray'}}>Sent From</Text> : ""
-
-                            <Text style={{fontFamily: 'Sora-Regular', fontSize: 16}}>{name}</Text>
-
-                        </View>
-                        <View style={{flexDirection: 'row', justifyContent: "space-between", marginTop: 30, alignItems: "flex-end", width: "100%"}}>
-
-                            <Text style={{fontFamily: 'Sora-Regular', fontSize: 16, color: 'gray'}}>Date Transferred</Text>
-                            <Text style={{fontFamily: 'Sora-Regular', fontSize: 16}}>
-                                {
-                                    data !== null ?
-                                        new Date(data.data().date.seconds*1000).toLocaleString().split(', ')[0]
-                                        : ""
-                                }
-                            </Text>
-
-                        </View>
-                        <View style={{flexDirection: 'row', justifyContent: "space-between", marginTop: 30, alignItems: "flex-end", width: "100%", paddingBottom: 50}}>
-                            <Text style={{fontFamily: 'Sora-Regular', fontSize: 16, color: 'gray'}}>Time Transfered</Text>
-                            <Text style={{fontFamily: 'Sora-Regular', fontSize: 16}}>
-                                {
-                                    data !== null ?
-                                        new Date(data.data().date.seconds*1000).toLocaleString().split(', ')[1]
-                                        : ""
-
-
-                                }</Text>
-
-                        </View>
-
-                        <View style={{
-                            flexDirection: 'row',
-                            marginBottom: 20,
-                            justifyContent: 'center',
-                            maxWidth: '100%',
-                            marginTop: 20
-                        }}>
-                            <TouchableOpacity onPress={() => {
-                                Haptics.selectionAsync()
-                                if (props.docID !== null) {
-                                    console.log(props.fromID)
-                                    deleteRequest(props.fromID, "20011188", props.amount, 0, props.transactionID, props.docID).then(() => {
-                                        props.reloadActionOne("20011188")
-                                        props.reloadActionTwo("20011188")
-                                        props.panel.current?.togglePanel()
-                                        changeTransactionStatus(props.fromID, props.transactionID, 2)
-
-                                    })
-
-                                    //Modify transaction to change status to rejected - 2
-                                }
-                            }} style={{
-                                flex: 1,
-                                borderWidth: 1,
-                                borderColor: 'black',
-                                padding: 15,
+                    <TouchableOpacity onPress={props.panel.current?.togglePanel} style={{
+                        padding: 3,
+                        width: 40,
+                        height: 40,
+                        flexDirection: 'row',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        backgroundColor: "#f9f9f9",
+                        borderRadius: 100
+                    }}>
+                        <Ionicons name={"close-outline"} size={27}/>
+                    </TouchableOpacity>
+                </View>
+                <View style={{
+                    flex: 1,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: 10,
+                    borderRadius: '100%',
+                    marginRight: 10
+                }}>
+                    <View>
+                        <View
+                            style={{
+                                width: 50,
+                                height: 50,
                                 borderRadius: '100%',
-                                marginTop: 10,
-                                marginRight: 10
-                            }}>
-                                <Text style={{
-                                    textAlign: "center",
-                                    fontFamily: 'Sora-Regular',
-                                    fontSize: 20,
-                                }}>Reject</Text>
-                            </TouchableOpacity>
-
-                            <TouchableOpacity onPress={() => {
-                                Haptics.selectionAsync()
-
-                                if (props.docID !== null) {
-                                    acceptRequest(props.fromID, "20011188", props.amount, 0, props.transactionID, props.docID).then(() => {
-                                        props.reloadActionOne("20011188")
-                                        props.reloadActionTwo("20011188")
-                                        props.panel.current?.togglePanel()
-                                        changeTransactionStatus(props.fromID, props.transactionID, 1)
-                                    })
-                                }
-
-                            }} style={{
-                                flex: 1,
-                                borderWidth: 1,
-                                borderColor: primaryColor,
+                                justifyContent: "center",
+                                alignItems: "center",
                                 backgroundColor: primaryColor,
-                                padding: 15,
-                                borderRadius: '100%',
-                                marginTop: 10
-                            }}>
+                            }}
+                        >
+                            {props.name ?
                                 <Text style={{
-                                    textAlign: "center",
-                                    fontFamily: 'Sora-Regular',
-                                    fontSize: 20,
-                                    color: 'white'
-                                }}>Accept</Text>
-                            </TouchableOpacity>
+                                    fontFamily: "Sora-SemiBold",
+                                    fontSize: 16,
+                                    color: "white",
+                                }}>{props.name.toString().split(" ")[0].substring(0, 1)}{props.name.toString().split(" ")[1].substring(0, 1)}</Text> : <></>}
                         </View>
-
-
                     </View>
+                    {props.name !== null ?
+                        <Text style={{
+                            textAlign: "left",
+                            fontFamily: 'Sora-Regular',
+                            fontSize: 20,
+                        }}>{props.name}</Text> : <></>
+                    }
 
                 </View>
+                <View style={{
+                    flexDirection: 'row',
+                    justifyContent: "space-between",
+                    marginTop: 30,
+                    alignItems: "center",
+                    width: "100%"
+                }}>
 
+
+                    <Text style={{fontFamily: 'Sora-SemiBold', fontSize: 24}}>${props.amount}</Text>
+
+
+                    <Text
+                        style={{
+                            fontSize: 16,
+                            textAlign: 'left',
+                            fontFamily: 'Sora-SemiBold'
+                        }}>{props.type === 0 ? "DuckBills" : props.type === 0 ? "Dining Dollars" : "Swipes"}</Text>
+                </View>
+                <View style={{
+                    height: 1,
+                    borderColor: '#f1f1f1',
+                    width: '100%',
+                    position: 'relative',
+                    borderWidth: .2,
+                    marginTop: 10
+                }}>
+                </View>
+                <View style={{
+                    flexDirection: 'row',
+                    justifyContent: "space-between",
+                    marginTop: 30,
+                    alignItems: "flex-end",
+                    width: "100%"
+                }}>
+
+                    <Text style={{fontFamily: 'Sora-Regular', fontSize: 16, color: 'gray'}}>Date
+                        Sent</Text>
+                    <Text style={{fontFamily: 'Sora-Regular', fontSize: 16}}>{
+                        props.date
+                    }</Text>
+
+                </View>
+                <View style={{
+                    flexDirection: 'row',
+                    justifyContent: "space-between",
+                    marginTop: 30,
+                    alignItems: "flex-end",
+                    width: "100%",
+                    paddingBottom: 0
+                }}>
+                    <Text style={{fontFamily: 'Sora-Regular', fontSize: 16, color: 'gray'}}>Time
+                        Sent</Text>
+                    {
+                        UNIXToTime(time)
+                    }
+
+                </View>
+                <TouchableOpacity onPress={() => {
+                    props.navigation.push("MessageDetail", {data: props.message})
+                }} style={{
+                    flexDirection: 'row',
+                    justifyContent: "space-between",
+                    marginTop: 30,
+                    alignItems: "flex-end",
+                    width: "100%",
+                    paddingBottom: 50
+                }}>
+                    <Text style={{fontFamily: 'Sora-Regular', fontSize: 16, color: 'gray'}}>Message</Text>
+                    <View style={{flexDirection: 'row',}}>
+                        <Text style={{fontFamily: 'Sora-Regular', fontSize: 16}}>{
+                            (props.message && props.message.length >= 10) ? props.message.substring(0, 9) + "..." : props.message
+                        }
+                        </Text>
+                        <Ionicons name={"chevron-forward-outline"} style={{marginLeft: 4}} size={20}/>
+                    </View>
+
+
+                </TouchableOpacity>
+
+
+                <View style={{
+                    flexDirection: 'row',
+                    marginBottom: 20,
+                    justifyContent: 'center',
+                    maxWidth: '100%',
+                    marginTop: 0
+                }}>
+                    <TouchableOpacity onPress={() => {
+                        Haptics.selectionAsync().then()
+                        if (props.docID !== null) {
+                            deleteRequest(props.fromID, "20011188", props.amount, 0, props.transactionID, props.docID).then(() => {
+                                props.reloadActionOne("20011188")
+                                props.reloadActionTwo("20011188")
+                                props.panel.current?.togglePanel()
+                                changeTransactionStatus(props.fromID, props.transactionID, 2).catch(()=>Toast.show({
+                                    type: 'failToast',
+                                    text1: 'Error',
+                                }))
+                            }).then(()=>Toast.show({
+                                type: 'successToast',
+                                text1: 'Failed To Reject',
+                            })).catch(()=>Toast.show({
+                                type: 'failToast',
+                                text1: 'Failed To Reject',
+                            }))
+                        }
+                    }
+                    }
+
+                                      style={{
+                                          flex: 1,
+                                          backgroundColor: '#f9f9f9',
+                                          padding: 15,
+                                          borderRadius: '100%',
+                                          marginTop: 10,
+                                          marginRight: 10
+                                      }}>
+                        <Text style={{
+                            textAlign: "center",
+                            fontFamily: 'Sora-Regular',
+                            fontSize: 20,
+                        }}>Reject</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity onPress={() => {
+                        Haptics.selectionAsync().then()
+
+                        if (props.docID !== null) {
+                            acceptRequest(props.fromID, "20011188", props.amount, 0, props.transactionID, props.docID).then(() => {
+                                props.reloadActionOne("20011188")
+                                props.reloadActionTwo("20011188")
+                                props.panel.current?.togglePanel()
+                                changeTransactionStatus(props.fromID, props.transactionID, 1).catch(()=>{
+                                    Toast.show({
+                                        type: 'failToast',
+                                        text1: 'Error',
+                                    })
+                                })
+                            }).then(()=>Toast.show({
+                                type: 'successToast',
+                                text1: 'Failed To Accept',
+                            })).catch(()=>Toast.show({
+                                type: 'failToast',
+                                text1: 'Failed To Accept',
+                            }))
+                        }
+
+                    }} style={{
+                        flex: 1,
+                        borderWidth: 1,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderColor: primaryColor,
+                        backgroundColor: primaryColor,
+                        padding: 15,
+                        borderRadius: '100%',
+                        marginTop: 10
+                    }}>
+                        <Text style={{
+                            textAlign: "center",
+                            fontFamily: 'Sora-Regular',
+                            fontSize: 20,
+                            marginRight: 10,
+                            color: 'white'
+                        }}>Accept</Text>
+                        <Svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2}
+                             stroke="white" className="w-6 h-6">
+                            <Path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+
+                        </Svg>
+
+
+                    </TouchableOpacity>
+                </View>
             </View>
 
         </BottomSheet>
@@ -541,6 +598,7 @@ export function Notifications() {
                 initialRouteName="Notifications">
                 <Stack.Screen name="Notifications" component={NotificationsComp}/>
                 <Stack.Screen name="TransactionDetail" component={TransactionDetail}/>
+                <Stack.Screen name="MessageDetail" component={MessageDetails}/>
 
 
             </Stack.Navigator>

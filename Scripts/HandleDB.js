@@ -13,6 +13,10 @@ import {
     orderBy,
     where
 } from 'firebase/firestore';
+import { initializeAuth } from "firebase/auth"
+import { getReactNativePersistence } from "firebase/auth/react-native"
+import AsyncStorage from "@react-native-async-storage/async-storage"
+import firebase from "firebase/compat";
 
 // Initialize Firebase
 const firebaseConfig = {
@@ -26,9 +30,11 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const db = getFirestore()
+const db = getFirestore(app)
 
 const usersRef = collection(db, "users");
+firebase.initializeApp(firebaseConfig);
+
 
 async function createRequest(from, to, amount, type, message, transactionID) {
     const docRef = collection(db, "users", to, "requests");
@@ -114,10 +120,10 @@ async function changeTransactionStatus(id, docID, status) {
     });
 }
 
-async function setQuickPay(id) {
+async function setQuickPay(id, quickPayID) {
     const docRef = collection(db, "users", id, "quickpay");
     if ((await getQuickPay(id)).size < 4) {
-        await setDoc(doc(docRef), {id: id});
+        await setDoc(doc(docRef), {id: quickPayID});
     }
 }
 
@@ -190,5 +196,5 @@ export {
     getRequest,
     acceptRequest,
     deleteRequest,
-    getUserColor
+    getUserColor,
 };

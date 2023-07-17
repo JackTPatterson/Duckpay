@@ -1,19 +1,27 @@
-import {Text, TouchableOpacity, View} from "react-native";
+import {Dimensions, Text, TouchableOpacity, View} from "react-native";
 import * as React from "react";
 import primaryColor from "../Constants";
-import {acceptRequest, deleteRequest, getUser} from "../Scripts/HandleDB";
+import {acceptRequest, deleteRequest, getUser, getUserColor} from "../Scripts/HandleDB";
 import {useEffect, useState} from "react";
 import * as Haptics from "expo-haptics";
-import {GetRequestType} from "../Scripts/GetType";
+import {GetType} from "../Scripts/GetType";
 
 function TransactionItem(props){
 
     let name, setname;
     [name, setname] = useState(null);
 
+    const [color, setColor] = useState(primaryColor);
+
+
     useEffect(()=>{
         getUser(props.name).then(res=>{
             setname(res);
+        }).then(()=>{
+            getUserColor(props.name).then((res)=>{
+                setColor(res)
+
+            })
         })
     })
 
@@ -32,7 +40,7 @@ function TransactionItem(props){
             if(props.nav !== null) {
                     props.nav.push("TransactionDetail", {data: props.docID})
             }
-            Haptics.selectionAsync();
+            Haptics.selectionAsync().then();
 
         }
         } style={{
@@ -51,10 +59,10 @@ function TransactionItem(props){
                         style={{
                             width: 40,
                             height: 40,
-                            borderRadius: '100%',
+                            borderRadius: 150,
                             justifyContent: "center",
                             alignItems: "center",
-                            backgroundColor: primaryColor,
+                            backgroundColor: color,
                         }}
                     >
                         <Text style={{
@@ -88,9 +96,17 @@ function RequestItem(props){
     let name, setname;
     [name, setname] = useState(null);
 
+    const [color, setColor] = useState(primaryColor);
+
+
     useEffect(()=>{
         getUser(props.name).then(res=>{
             setname(res);
+        }).then(()=>{
+            getUserColor(props.name).then((res)=>{
+                setColor(res)
+
+            })
         })
     })
 
@@ -103,12 +119,10 @@ function RequestItem(props){
     }
     catch{}
 
-
     return (
         <TouchableOpacity onPress={() => {
-            Haptics.impactAsync(Haptics.selectionAsync());
+            Haptics.selectionAsync().then()
             if(name !== null) {
-
                 props.data({
                     amount: props.change,
                     name: name,
@@ -116,36 +130,36 @@ function RequestItem(props){
                     docID: props.docID,
                     transactionID: props.transactionID,
                     fromID: props.fromID,
-                    type: props.type
+                    type: props.type,
+                    date: props.date,
                 })
             }
                 props.panel.current?.togglePanel();
         }
         }
           style={{
+              width: Dimensions.get("window").width,
+              maxWidth: Dimensions.get("window").width - 30,
             borderRadius: 14,
             backgroundColor: '#f9f9f9',
             paddingHorizontal: 10,
             paddingVertical: 20,
-            marginBottom: 25,
-
-
+            marginBottom: 10
         }}>
             <View style={{
                 flexDirection: 'row',
-                justifyContent: 'space-between',
                 alignItems: 'center',
-                marginBottom: 20
+                marginBottom: 10
             }}>
                 <View
                     style={{
                         width: 40,
                         height: 40,
                         marginRight: 10,
-                        borderRadius: '100%',
+                        borderRadius: 150,
                         justifyContent: "center",
                         alignItems: "center",
-                        backgroundColor: primaryColor,
+                        backgroundColor: color,
                     }}
                 >
                     <Text style={{
@@ -154,26 +168,18 @@ function RequestItem(props){
                         color: "white",
                     }}>{firstLetter}{lastLetter}</Text>
                 </View>
-                <GetRequestType type={props.type} name={name}/>
-
-
+                <Text style={{fontFamily: 'Sora-SemiBold'}}>{name}</Text>
             </View>
+
             <View style={{
                 flexDirection: 'row',
                 justifyContent: 'space-between',
                 alignItems: 'center',
+                marginBottom: 30
             }}>
 
                 <Text style={{fontFamily: 'Sora-SemiBold', textAlign: 'center', fontSize: 24}}>{props.type === 2 ? "" : "$"}{props.change}</Text>
-
-
-                    <View style={{
-                        flexDirection: 'row',
-                        justifyContent: 'flex-end',
-                        alignItems: 'center',
-                        gap: 10
-                    }}>
-                    </View>
+                <GetType type={props.type}/>
             </View>
 
         </TouchableOpacity>

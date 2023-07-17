@@ -35,14 +35,14 @@ import {getQuickPay, getTransactions, getUser, setQuickPay} from "../Scripts/Han
 import {Setup} from "./Setup";
 import {GetID} from "./GetID";
 import {Request} from "./Request";
-import {timeConverter} from "../Scripts/timeconverter";
+import {UNIXTODateConverter} from "../Scripts/UNIXTODateConverter";
 import {TransactionDetail} from "./TransactionDetail";
 import {Message} from "./Message";
 import Toast from "react-native-toast-message";
 import {toastConfig} from "../Scripts/toast";
 import {UserBottomSheet} from "../components/UserBottomSheet";
 import ActivityIndicator from "../components/ActivityIndicator";
-import notifyTester, {schedulePushNotification} from "../Scripts/NotificationsTester";
+import {Search} from "./Search";
 
 export function Home() {
 
@@ -173,20 +173,20 @@ export function Home() {
     function getBills() {
         setBalance("$300.50")
         changeBalanceType(0);
-        Haptics.selectionAsync()
+        Haptics.selectionAsync().then()
     }
 
     async function getDiningDollars()  {
         setBalance("$200.00")
         changeBalanceType(1);
 
-        Haptics.selectionAsync()
+        Haptics.selectionAsync().then()
     }
 
     function getSwipes() {
         setBalance("145")
         changeBalanceType(2);
-        Haptics.selectionAsync()
+        Haptics.selectionAsync().then()
     }
 
     const Stack = createStackNavigator();
@@ -228,7 +228,7 @@ export function Home() {
     });
 
     const HomeComp = ({navigation}) => {
-        if (!fontLoaded || !data) {
+        if (!fontLoaded || !data || !quickPay) {
             return <ActivityIndicator/>
         } else
             return (
@@ -368,7 +368,7 @@ export function Home() {
                                         <TouchableWithoutFeedback onPressOut={onSendPressOut} onPressIn={onSendPressIn}
                                                                   onPress={() => {
                                                                       navigation.push('Send')
-                                                                      Haptics.selectionAsync();
+                                                                      Haptics.selectionAsync().then();
 
                                                                   }} style={{
                                             flexDirection: 'column',
@@ -410,7 +410,7 @@ export function Home() {
                                         <TouchableWithoutFeedback onPressOut={onDepositPressOut}
                                                                   onPressIn={onDepositPressIn} onPress={() => {
                                             panelRef2.current?.togglePanel();
-                                            Haptics.selectionAsync();
+                                            Haptics.selectionAsync().then();
 
                                         }} style={{flexDirection: 'column', justifyContent: 'center',}}>
                                             <View>
@@ -451,7 +451,7 @@ export function Home() {
                                                                   onPressIn={onScanPressIn} onPress={() => {
                                             navigation.push('Scanner')
 
-                                            Haptics.selectionAsync();
+                                            Haptics.selectionAsync().then();
 
                                         }} style={{flexDirection: 'column', justifyContent: 'center'}}>
                                             <View style={{paddingTop: 5}}>
@@ -494,7 +494,7 @@ export function Home() {
                                         <TouchableWithoutFeedback onPressOut={onQRPressOut}
                                                                   onPressIn={onQRPressIn} onPress={() => {
                                             panelRef.current.togglePanel();
-                                            Haptics.selectionAsync();
+                                            Haptics.selectionAsync().then();
 
                                         }} style={{flexDirection: 'column', justifyContent: 'center'}}>
                                             <View>
@@ -536,20 +536,26 @@ export function Home() {
                                 <Text style={{
                                     fontSize: 20,
                                     fontFamily: 'Sora-Regular',
-                                }}>Quick Pay</Text><View style={{
+                                }}>Quick Pay</Text><View style={quickPay.length < 4 ? {
+                                flexDirection: 'row',
+                                justifyContent: 'flex-start',
+                                gap: 40,
+                                alignItems: 'center',
+                            }: {
                                 flexDirection: 'row',
                                 justifyContent: 'space-between',
                                 alignItems: 'center',
                             }}>
 
 
-                                {quickPay != null ? (
+
+
+                                {
                                     quickPay.map(dt => {
-                                        return <UserBox send={true} panel={panelRef4} docID={dt.id} navigate={navigation} name={dt.data().id}/>
+                                        return  <UserBox send={true} panel={panelRef4} docID={dt.id} navigate={navigation} name={dt.data().id}/>
                                     })
-                                ) : (
-                                    <Text>Loading</Text>
-                                )}
+                                }
+
 
 
                             </View>
@@ -596,7 +602,7 @@ export function Home() {
                                                 if (dt.data().amount !== undefined)
                                                     return <TransactionItem home docID={dt.id} nav={navigation}
                                                                             status={statusText}
-                                                                            info={timeConverter(dt.data().date.seconds)}
+                                                                            info={UNIXTODateConverter(dt.data().date.seconds)}
                                                                             change={dt.data().recieved ? "+$" + dt.data().amount : "-$" + dt.data().amount}
                                                                             name={dt.data().to}/>
                                             })
@@ -604,7 +610,6 @@ export function Home() {
                                             <Text style={{
                                                 fontFamily: 'Sora-SemiBold',
                                                 fontSize: 24,
-                                                marginTop: 20,
                                                 marginBottom: 0,
                                                 zIndex: 1
                                             }}>Nothing To See Here</Text>
@@ -709,7 +714,7 @@ export function Home() {
                                         </TouchableOpacity>
                                         <TouchableOpacity onPress={ () => {
                                             Toast.show({
-                                                type: 'tomatoToast',
+                                                type: 'successToast',
                                                 text1: 'ID Copied'
                                             });
                                         }} style={{
@@ -791,7 +796,7 @@ export function Home() {
                                 </TouchableOpacity>
                             </View>
                             <TouchableOpacity onPress={() => {
-                                Haptics.selectionAsync()
+                                Haptics.selectionAsync().then()
                                 panelRef2.current.togglePanel();
 
 
@@ -1092,7 +1097,7 @@ export function Home() {
                                         </TouchableOpacity>
                                         <TouchableOpacity onPress={async () => {
                                             Toast.show({
-                                                type: 'tomatoToast',
+                                                type: 'successToast',
                                                 text1: 'ID Copied'
                                             });
                                         }} style={{
@@ -1165,6 +1170,9 @@ export function Home() {
                     <Stack.Screen name="Request" component={Request}/>
                     <Stack.Screen name="TransactionDetail" component={TransactionDetail}/>
                     <Stack.Screen name="Message" component={Message}/>
+                    <Stack.Screen name="Search" component={Search}/>
+
+
 
 
                 </Stack.Navigator>

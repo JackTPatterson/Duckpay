@@ -38,7 +38,7 @@ export const GetID = ({navigation, route}) => {
 
 
     function handleInput(digitVal){
-        Haptics.selectionAsync()
+        Haptics.selectionAsync().then()
         if (!digit.includes(".")) {
             setKey((digit) => digit + digitVal);
         }
@@ -295,7 +295,7 @@ export const GetID = ({navigation, route}) => {
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     onPress={() => {
-                                        Haptics.selectionAsync()
+                                        Haptics.selectionAsync().then()
                                         setKey((digit) => digit.slice(0, -1))
 
 

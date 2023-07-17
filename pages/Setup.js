@@ -58,7 +58,7 @@ export const Setup = ({navigation, route}) => {
                     />
 
                     <TouchableOpacity onPress={() => {
-                        navigation.push("Pin");
+                        navigation.push("SignIn");
                     }} style={{
                         width: '100%',
                         marginBottom: 100,

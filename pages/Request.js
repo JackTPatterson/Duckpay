@@ -36,6 +36,9 @@ export const Request = ({navigator, route}) => {
         Toast.show({
             type: 'success',
             text1: 'Request Accepted',
+            position: 'bottom',
+            bottomOffset: 0
+
         });
     }
 
@@ -43,6 +46,8 @@ export const Request = ({navigator, route}) => {
         Toast.show({
             type: 'error',
             text1: 'Error Accepting Request',
+            position: 'bottom',
+            bottomOffset: 0
         });
     }
 
@@ -50,6 +55,8 @@ export const Request = ({navigator, route}) => {
         Toast.show({
             type: 'reject',
             text1: 'Rejected Request',
+            position: 'bottom',
+            bottomOffset: 0
         });
     }
 
@@ -126,7 +133,7 @@ export const Request = ({navigator, route}) => {
                     }}>
 
                         <TouchableOpacity onPress={() => {
-                            Haptics.selectionAsync()
+                            Haptics.selectionAsync().then()
                             deleteRequest("20011188",  route.params.data).then(()=>showReject()).catch(()=>showFail())
                         }} style={{
                             flex:1,
@@ -145,7 +152,7 @@ export const Request = ({navigator, route}) => {
                         </TouchableOpacity>
 
                         <TouchableOpacity onPress={() => {
-                            Haptics.selectionAsync()
+                            Haptics.selectionAsync().then()
                             acceptRequest(data.data().from, "20011188", 1, data.data().type, route.params.data).then(()=>showSuccess()).catch(()=>showFail())
                         }} style={{
                             flex:1,

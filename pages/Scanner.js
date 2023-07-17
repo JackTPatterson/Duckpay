@@ -76,7 +76,7 @@ export const Scanner = ({navigation}) => {
         <View style={styles.container}>
           <TouchableOpacity  onPress={
             () => {
-              Haptics.selectionAsync()
+              Haptics.selectionAsync().then()
               navigation.navigate('Home')
 
             }
