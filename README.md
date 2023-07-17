@@ -1,8 +1,8 @@
 # **DuckPay**
 
-### ***This app is purely conceptual***
-
 An internal school payment system for Stevens Institute of Technology
+
+### ***This app is purely conceptual***
 
 #### Created using React Native Expo
 
